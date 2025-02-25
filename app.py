@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, flash, session, send_file
+from flask import Flask, render_template, request, redirect, flash, session, send_file, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
@@ -32,7 +32,21 @@ class User(db.Model):
 
     def check_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password.encode('utf-8'))
-    
+
+# Create Database for Customer
+class Customer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    customer_name = db.Column(db.String(100), nullable=False)
+    customer_village = db.Column(db.String(100), nullable=False)
+    customer_mob_no = db.Column(db.String(100), nullable=False)
+
+    def __init__(self, user_id, customer_name, customer_village, customer_mob_no):
+        self.user_id = user_id
+        self.customer_name = customer_name
+        self.customer_village = customer_village
+        self.customer_mob_no = customer_mob_no
+
 class Products(db.Model):
     prod_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -61,6 +75,28 @@ with app.app_context():
 @app.route('/')
 def index():
     return render_template('home.html', title='Home')
+
+
+# @app.route('/search', methods=['GET'])
+# def search():
+#     if 'email' in session:
+#         user = User.query.filter_by(email=session['email']).first()
+#         query = request.args.get('q', '')
+
+#         if query:
+#             results = Products.query.filter(
+#                 Products.user_id == user.id,
+#                 Products.prod_name.ilike(f"%{query}%")
+#             ).limit(5).all()
+
+#             suggestions = [product.prod_name for product in results]
+#             return jsonify(suggestions)
+
+#         return jsonify([])
+#     else:
+#         flash('You need to login first.', 'error')
+#         return redirect('/login')
+
 
 # Register Page
 @app.route('/signup', methods=['GET', 'POST'])
@@ -116,7 +152,75 @@ def dashboard():
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
+
+#Customer
+@app.route('/customers', methods=['GET', 'POST'])
+def customers():
+    if 'email' in session:
+        user = User.query.filter_by(email=session['email']).first()
     
+        # Get page number from request arguments, default to 1
+        page = request.args.get('page', 1, type=int)
+        
+        # Paginate products (10 per page)
+        customers = Customer.query.filter(Customer.user_id == user.id).paginate(page=page, per_page=10)
+        total_customer = Customer.query.filter(Customer.user_id == user.id).count()
+
+        return render_template('customer.html', title='Customer', current_page='customer', 
+                               user=user, customers=customers, total_customer=total_customer, min=min, enumerate=enumerate)
+
+    else:
+        flash('You need to login first.', 'error')
+        return redirect('/login')
+    
+@app.route('/delete_customer/<int:id>', methods=['GET'])
+def delete_customer(id):
+    if 'email' in session:
+        user = User.query.filter_by(email=session['email']).first()
+        if not user:
+            flash('User not found.', 'error')
+            return redirect('/login')
+
+        customer = Customer.query.filter_by(id=id, user_id=user.id).first()
+        if not customer :
+            flash('Customer not found.', 'error')
+            return redirect('/customers')
+
+        try:
+            db.session.delete(customer)
+            db.session.commit()
+            flash('Customer deleted successfully.', 'success')
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            flash('An error occurred while deleting the customer. Please try again.', 'error')
+            print(f"SQLAlchemyError: {e}")
+
+        return redirect('/customers')
+    else:
+        flash('You need to login first.', 'error')
+        return redirect('/login')
+
+
+#add_customer
+@app.route('/add_customer', methods=['GET', 'POST'])
+def add_customer():
+    if 'email' in session:
+        user = User.query.filter_by(email=session['email']).first()
+        if request.method == 'POST':
+            customer_name = request.form['customer_name']
+            customer_village = request.form['customer_vill_name']
+            customer_mob_no = request.form['mobile_number']
+        
+            new_data = Customer(user_id=user.id, customer_name=customer_name, customer_village=customer_village, customer_mob_no=customer_mob_no)
+            db.session.add(new_data)
+            db.session.commit()
+            flash('Customer Added Successful.', 'success')
+
+        return render_template('add_customer.html', title='Add Customer', current_page = 'add_customer', user=user)
+    else:
+        flash('You need to login first.', 'error')
+        return redirect('/login')
+
 #Products
 @app.route('/products', methods=['GET', 'POST'])
 def products():
