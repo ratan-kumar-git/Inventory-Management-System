@@ -1,0 +1,94 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<main class="p-4 md:ml-64 h-auto pt-20">
+    <!-- Modal content -->
+    <div class="p-5 m-2 md:m-5 bg-white rounded-lg shadow dark:bg-gray-800">
+        <!-- Modal header -->
+        <div class="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                Add New Product
+            </h3>
+        </div>
+        <!-- Modal body -->
+        <form action="/add_product" method="post">
+            <div class="grid gap-4 mb-4 sm:grid-cols-2">
+                <div>
+                    <label for="Product Name"
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Product Name</label>
+                    <input type="text" name="product_name" id="product_name"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="Enter Product Name" required="">
+                </div>
+                <div>
+                    <label for="Product Quantity"
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Product Quantity</label>
+                    <input type="number" name="product_quantity" id="product_quantity"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="50" required="">
+                </div>
+                <div>
+                    <label for="Selling Price"
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Selling Price</label>
+                    <input type="number" name="selling_price" id="selling_price"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="₹550" required="">
+                </div>
+                <div>
+                    <label for="MRP" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">MRP</label>
+                    <input type="number" name="mrp" id="mrp"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="₹550" required="">
+                </div>
+                <div>
+                    <label for="Purches Price"
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Purches Price
+                    </label>
+                    <input type="number" name="purches_price" id="purches_price"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="₹550" required="">
+                </div>
+                <div>
+                    <label for="Min Quantity" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Min
+                        Quantity Alert</label>
+                    <input type="number" name="min_quantity" id="min_quantity"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="50" required="">
+                </div>
+            </div>
+
+            <div class="w-full flex justify-center text-center">
+                <button type="submit"
+                    class="w-full text-white items-center bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    Add New Product
+                </button>
+            </div>
+
+            <div id="alert-1"
+                class="flex items-center p-4 mt-5 text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-900 dark:text-blue-400"
+                role="alert">
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <div class="ms-3 text-sm font-medium">
+                    {{ messages[0] }}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <button type="button"
+                    class="ms-auto -mx-1.5 -my-1.5 bg-blue-50 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-blue-400 dark:hover:bg-gray-700"
+                    data-dismiss-target="#alert-1" aria-label="Close">
+                    <span class="sr-only">Close</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                </button>
+            </div>
+        </form>
+    </div>
+</main>
+
+{% endblock %}
