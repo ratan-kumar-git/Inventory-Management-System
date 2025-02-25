@@ -173,6 +173,35 @@ def customers():
         flash('You need to login first.', 'error')
         return redirect('/login')
     
+#Download Excel
+@app.route('/download_customer', methods=['GET'])
+def download_customer():
+    if 'email' in session:
+        user = User.query.filter_by(email=session['email']).first()
+        customers = Customer.query.filter(Customer.user_id == user.id).all()
+
+        # Create a DataFrame from the query results
+        data = [{
+            "Name" : data.customer_name,
+            "village": data.customer_village,
+            "Mob-No.": data.customer_mob_no,
+            "Dues": 0,
+        } for data in customers]
+
+        df = pd.DataFrame(data)
+
+        # Convert DataFrame to Excel
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=True, sheet_name='Customer List')
+        output.seek(0)
+        return send_file(output, download_name=f'Customers_list.xlsx', as_attachment=True)
+    else:
+        flash('You need to login first.', 'error')
+        return redirect('/login')
+    
+
+    
 @app.route('/delete_customer/<int:id>', methods=['GET'])
 def delete_customer(id):
     if 'email' in session:
