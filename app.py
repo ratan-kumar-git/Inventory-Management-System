@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request, redirect, flash, session, send_file, jsonify
+from flask import Flask, render_template, request, redirect, flash, session, send_file, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
 from io import BytesIO
 import bcrypt
+import datetime
+import pytz
 
 app = Flask(__name__)
 
@@ -13,6 +15,9 @@ app.secret_key = 'Bablu@12345'
 
 db = SQLAlchemy(app)
 
+
+def india_time():
+    return datetime.datetime.now(pytz.timezone("Asia/Kolkata"))
 
 # Create Database with the name of "User"
 class User(db.Model):
@@ -65,7 +70,34 @@ class Products(db.Model):
         self.prod_mrp = prod_mrp
         self.prod_buy_price = prod_buy_price
         self.prod_min_quantity = prod_min_quantity
-    
+
+class Billing(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+    billing_date = db.Column(db.DateTime, default=india_time)
+    total_amount = db.Column(db.Float, nullable=False)
+    amount_paid = db.Column(db.Float, default=0)  # Amount the customer paid
+    dues = db.Column(db.Float, default=0)  # Remaining amount to be paid
+
+    # Relationship
+    customer = db.relationship('Customer', backref=db.backref('bills', lazy=True, cascade="all"))
+
+    def __init__(self, customer_id, billing_date, total_amount, amount_paid, dues):
+        self.customer_id = customer_id
+        self.total_amount = total_amount
+        self.amount_paid = amount_paid
+        self.dues = dues
+
+class BillingDetails(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    billing_id = db.Column(db.Integer, db.ForeignKey('billing.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.prod_id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    total_price = db.Column(db.Float, nullable=False)
+
+    # Relationships
+    billing = db.relationship('Billing', backref=db.backref('details', lazy=True, cascade="all"))
+    product = db.relationship('Products', backref=db.backref('billing_details', lazy=True, cascade="all"))
 
 with app.app_context():
     db.create_all()
@@ -299,7 +331,6 @@ def download_excel():
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
-    
 
 #Products
 @app.route('/add_product', methods=['GET', 'POST'])
@@ -400,11 +431,104 @@ def delete_product(prod_id):
 def billing():
     if 'email' in session:
         user = User.query.filter_by(email=session['email']).first()
-        return render_template('billing.html', title='Billing', current_page = 'billing', user=user)
+        customers = Customer.query.filter_by(user_id=user.id).all()
+        products = Products.query.filter_by(user_id=user.id).all()
+
+
+        return render_template('billing.html', title='Billing', current_page = 'billing', user=user, customers=customers, products=products)
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
     
+
+@app.route('/get_customer_details/<int:customer_id>', methods=['GET'])
+def get_customer_details(customer_id):
+    customer = db.session.get(Customer, customer_id)
+    billing =  Billing.query.filter_by(customer_id = customer_id).first()
+
+    if billing:
+        dues = f"₹{billing.dues}"
+    else:
+        dues = "₹0"
+
+    if customer:
+        # Set timezone to India (IST)
+        ist = pytz.timezone('Asia/Kolkata')
+        india_date = datetime.datetime.now(ist).strftime("%d-%b-%Y")  # Format: 12-Jan-2024
+        india_time = datetime.datetime.now(ist).strftime("%I : %M %p")
+
+        return jsonify({
+            'customer_village': customer.customer_village,
+            'customer_phone': customer.customer_mob_no,
+            'today_date': india_date,
+            'today_time': india_time,
+            'customer_dues': dues
+        })
+    return jsonify({'error': 'Customer not found'}), 404
+
+
+@app.route('/admin/billing', methods=['GET', 'POST'])
+def create_bill():
+    if 'email' in session:
+        user = User.query.filter_by(email=session['email']).first()
+
+        if request.method == 'POST':
+            print(request.form)  # Debugging Step
+
+            customer_id = request.form.get('customer_id')
+            product_ids = request.form.getlist('product_id')  # ✅ Fix applied
+            amount_paid = float(request.form.get('amount_paid', 0))
+
+            if not customer_id or not product_ids:
+                flash("Please select a customer and at least one product!", "danger")
+                return redirect(url_for('create_bill'))
+
+            # Process Billing
+            total_amount = 0
+            billing = Billing(customer_id=customer_id, billing_date=india_time, total_amount=0, amount_paid=amount_paid, dues=0)
+            db.session.add(billing)
+            db.session.flush()  # Get billing ID before committing
+
+            for product_id in product_ids:
+                quantity = int(request.form.get(f'quantity_{product_id}', 0))  # ✅ Fix applied
+                product = db.session.get(Products, product_id)
+
+                if product and product.prod_quantity >= quantity:
+                    total_price = product.prod_sell_price * quantity
+                    total_amount += total_price
+
+                    # Deduct stock
+                    product.prod_quantity -= quantity
+
+                    # Add to BillingDetails
+                    bill_detail = BillingDetails(
+                        billing_id=billing.id,
+                        product_id=product.prod_id,
+                        quantity=quantity,
+                        total_price=total_price
+                    )
+                    db.session.add(bill_detail)
+                else:
+                    flash(f"Insufficient stock for {product.prod_name}!", "danger")
+                    return redirect(url_for('create_bill'))
+
+            # Calculate dues
+            billing.total_amount = total_amount
+            billing.dues = total_amount - amount_paid
+
+            db.session.commit()
+            flash("Billing successful!", "success")
+            return redirect(url_for('create_bill'))
+        
+        customers = Customer.query.filter_by(user_id=user.id).all()
+        products = Products.query.filter_by(user_id=user.id).all()
+        return render_template('billing_org.html', customers=customers, products=products)
+    
+    else:
+        flash('You need to login first.', 'error')
+        return redirect('/login')
+
+
 #Invoice
 @app.route('/invoice', methods=['GET', 'POST'])
 def invoice():

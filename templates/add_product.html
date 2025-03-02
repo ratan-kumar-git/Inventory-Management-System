@@ -54,7 +54,7 @@
                         Quantity Alert</label>
                     <input type="number" name="min_quantity" id="min_quantity"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                        placeholder="50" required="">
+                        placeholder="50" required="" value="10">
                 </div>
             </div>
 
@@ -68,12 +68,14 @@
             <div id="alert-1"
                 class="flex items-center p-4 mt-5 text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-900 dark:text-blue-400"
                 role="alert">
-                {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                <div class="ms-3 text-sm font-medium">
-                    {{ messages[0] }}
-                </div>
-                {% endif %}
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="{{ category }}" class="ms-3 text-sm font-medium">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
                 {% endwith %}
 
                 <button type="button"

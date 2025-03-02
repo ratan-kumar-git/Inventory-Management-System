@@ -3,49 +3,327 @@
 {% block content %}
 
 <main class="p-4 md:ml-64 h-auto pt-20">
-    <!-- Modal content -->
     <div class="p-5 m-2 md:m-5 bg-white rounded-lg shadow dark:bg-gray-800">
-        <!-- Modal header -->
-        <div class="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                Billing
+        <!-- Header Div -->
+        <div class="flex justify-center items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
+            <h3 class="text-2xl uppercase font-extrabold text-gray-900 dark:text-white">
+                Kishan Moters Parts
             </h3>
         </div>
-        <!-- Modal body -->
-        <form action="#" method="post">
-            <div class="grid gap-4 mb-4 sm:grid-cols-2">
-                <div>
-                    <label for="Customer Name"
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Customer Name</label>
-                    <input type="text" name="customer_name" id="customer_name"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                        placeholder="Enter Customer Name" required="">
+
+        <!-- Form  -->
+        <form action="/billing" method="post">
+            <div class="grid sm:grid-cols-2 pb-4 rounded-t border-b dark:border-gray-600">
+                <!-- Right Box/Div -->
+                <div class="text-lg font-medium text-gray-900 dark:text-white">
+                    <label for="Customer Name" class="">Name :</label>
+                    <select id="customer_select" name="customer_id" required
+                        class="p-1 w-2/4 text-sm bg-gray-200 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-900 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                        <option value="">Select Customer</option>
+                        {% for customer in customers %}
+                        <option value="{{ customer.id }}">{{ customer.customer_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="Customer Village" class="block">
+                        Address : <span id="customer_vill"></span>
+                    </label>
+                    <label for="Customer Village" class="block">
+                        Dues : <span id="dues"></span>
+                    </label>
                 </div>
-                <div>
-                    <label for="Customer Vill Name"
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Village Name</label>
-                    <input type="text" name="customer_vill_name" id="customer_vill_name"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                        placeholder="Enter Village Name" required="">
-                </div>
-                <div>
-                    <label for="mobile_number"
-                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone Number</label>
-                    <input type="tel" name="mobile_number" id="mobile_number"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                        placeholder="9876543210" required pattern="[6-9]{1}[0-9]{9}" inputmode="numeric" maxlength="10">
+
+                <!-- Right Box/Div -->
+                <div class="text-lg md:text-right font-medium text-gray-900 dark:text-white">
+                    <label for="date" class="block">
+                        Date : <span id="date"></span>
+                    </label>
+                    <label for="time" class="block">
+                        Time : <span id="time"></span>
+                    </label>
+                    <label for="customer_phone" class="block">
+                        Ph No. : <span id="customer_phone"></span>
+                    </label>
                 </div>
             </div>
 
-            <div class="w-full flex justify-center text-center">
+            <!-- Modal toggle for Billing Item -->
+            <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
+                <div
+                    class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
+                    <button type="button" id="updateProductButton" data-modal-target="updateProductModal"
+                        data-modal-toggle="updateProductModal"
+                        class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+                        <svg class="h-3.5 w-3.5 mr-2" fill="currentColor" viewbox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path clip-rule="evenodd" fill-rule="evenodd"
+                                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
+                        </svg>
+                        Add product
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main modal for Billing Item -->
+            <div id="updateProductModal" tabindex="-1" aria-hidden="true"
+                class="hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-modal md:h-full">
+                <div class="relative p-4 w-full max-w-2xl">
+                    <!-- Modal content -->
+                    <div class="relative p-4 bg-white rounded-lg shadow dark:bg-gray-900 sm:p-5">
+                        <!-- Modal header -->
+                        <div
+                            class="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                Product List
+                            </h3>
+                            <button type="button"
+                                class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                                data-modal-toggle="updateProductModal">
+                                <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                                <span class="sr-only">Close modal</span>
+                            </button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="text-lg font-medium text-gray-900 dark:text-white overflow-auto h-[80vh] md:h-96">
+                            <table id="product_table"
+                                class="w-full  border-collapse border border-gray-300 dark:border-gray-600">
+                                <thead class="bg-gray-200 dark:bg-gray-900">
+                                    <tr>
+                                        <th class="whitespace-nowrap border border-gray-300 dark:border-gray-600 p-2">
+                                            SNo</th>
+                                        <th class="whitespace-nowrap border border-gray-300 dark:border-gray-600 p-2">
+                                            Product Name
+                                        </th>
+                                        <th class="whitespace-nowrap border border-gray-300 dark:border-gray-600 p-2">
+                                            MRP</th>
+                                        <th class="whitespace-nowrap border border-gray-300 dark:border-gray-600 p-2">
+                                            Sell Price</th>
+                                        <th class="whitespace-nowrap border border-gray-300 dark:border-gray-600 p-2">
+                                            Buy Price</th>
+                                        <th class="whitespace-nowrap border border-gray-300 dark:border-gray-600 p-2">
+                                            Quantity</th>
+                                        <th class="whitespace-nowrap border border-gray-300 dark:border-gray-600 p-2">
+                                            Add</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for product in products %}
+                                    <tr>
+                                        <td class="border border-gray-300 dark:border-gray-600 p-2">
+                                            {{loop.index }}
+                                        </td>
+                                        <td class="border border-gray-300 dark:border-gray-600 p-2">
+                                            {{product.prod_name }}
+                                        </td>
+                                        <td class="border border-gray-300 dark:border-gray-600 p-2">
+                                            {{product.prod_mrp }}
+                                        </td>
+                                        <td class="border border-gray-300 dark:border-gray-600 p-2">
+                                            {{product.prod_sell_price }}
+                                        </td>
+                                        <td class="border border-gray-300 dark:border-gray-600 p-2">
+                                            {{product.prod_buy_price }}
+                                        </td>
+                                        <td class="border border-gray-300 dark:border-gray-600 p-2">
+                                            {{product.prod_quantity }}
+                                        </td>
+                                        <td class="border border-gray-300 dark:border-gray-600 p-2">
+                                            <button class="add-to-bill text-blue-500 hover:text-blue-700"
+                                                data-prod-id="{{ product.prod_id }}"
+                                                data-prod-name="{{ product.prod_name }}"
+                                                data-prod-mrp="{{ product.prod_mrp }}"
+                                                data-prod-sell="{{ product.prod_sell_price }}">
+                                                ➕
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Billing Item list -->
+            <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="billing-table  w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                        <thead class="text-sm text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="px-4 py-3 whitespace-nowrap">SNo.</th>
+                                <th scope="col" class="px-4 py-3 whitespace-nowrap">Product Name</th>
+                                <th scope="col" class="px-4 py-3 whitespace-nowrap">Quantity</th>
+                                <th scope="col" class="px-4 py-3 whitespace-nowrap">MRP</th>
+                                <th scope="col" class="px-4 py-3 whitespace-nowrap">Selling Price</th>
+                                <th scope="col" class="px-4 py-3 whitespace-nowrap">Total</th>
+                                <th scope="col" class="px-4 py-3 whitespace-nowrap">Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Items will be added here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <!-- Submit Button -->
+            <div class="w-full flex justify-center text-center mt-5">
                 <button type="submit"
-                    class="w-full text-white items-center bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                    Add New Product
+                    class="text-sm px-5 py-2.5 w-full text-white items-center bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    Create Bill
                 </button>
             </div>
         </form>
     </div>
-
 </main>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const customerSelect = document.getElementById('customer_select');
+        const customerVill = document.getElementById('customer_vill');
+        const customerPhone = document.getElementById('customer_phone');
+        const dateField = document.getElementById('date');
+        const timeField = document.getElementById('time');
+        const duesField = document.getElementById('dues');
+
+        customerSelect.addEventListener('change', function () {
+            let customerId = this.value;
+
+            if (customerId) {
+                fetch(`/get_customer_details/${customerId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.error) {
+                            console.error('Error:', data.error);
+                            return;
+                        }
+
+                        // Update span elements with fetched data
+                        customerVill.textContent = data.customer_village || 'N/A';
+                        customerPhone.textContent = data.customer_phone || 'N/A';
+                        dateField.textContent = data.today_date || 'N/A';
+                        timeField.textContent = data.today_time || 'N/A';
+                        duesField.textContent = data.customer_dues || 'N/A';
+                    })
+                    .catch(error => console.error('Error fetching customer details:', error));
+            } else {
+                // Clear fields if no customer is selected
+                customerVill.textContent = '';
+                customerPhone.textContent = '';
+                dateField.textContent = '';
+                timeField.textContent = '';
+                duesField.textContent = '';
+            }
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const billingTableBody = document.querySelector('.billing-table tbody');
+        let serialNumber = 1;
+
+        if (!billingTableBody) {
+            console.error("Billing table body not found! Ensure the table exists.");
+            return;
+        }
+
+        document.querySelectorAll('.add-to-bill').forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault(); // Prevent page refresh
+
+                const prodId = this.getAttribute('data-prod-id');
+                const prodName = this.getAttribute('data-prod-name');
+                const prodMRP = parseFloat(this.getAttribute('data-prod-mrp'));
+                const prodSell = parseFloat(this.getAttribute('data-prod-sell'));
+
+                if (!prodId) {
+                    console.error("Error: Product ID is missing!", { prodId, prodName, prodMRP, prodSell });
+                    return;
+                }
+
+                console.log("Product Added:", prodId, prodName, prodMRP, prodSell);
+
+                // Check if product already exists in the table
+                let existingRow = billingTableBody.querySelector(`tr[data-prod-id="${prodId}"]`);
+                if (existingRow) {
+                    let quantityInput = existingRow.querySelector('.quantity-input');
+                    let totalCell = existingRow.querySelector('.total-price');
+
+                    quantityInput.value = parseInt(quantityInput.value) + 1;
+                    totalCell.textContent = (quantityInput.value * prodSell).toFixed(2);
+                    return;
+                }
+
+                // Create a new row for the new product
+                const newRow = document.createElement('tr');
+                newRow.setAttribute('data-prod-id', prodId);
+                newRow.innerHTML = `
+                <td class="border-b px-4 py-3 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    ${serialNumber++}
+                </td>
+                <td class="border-b px-4 py-3 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    ${prodName}
+                </td>
+                <td class="border-b px-4 py-3 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <button type="button" class="decrease-qty px-2 bg-gray-200 dark:bg-gray-900 rounded">−</button>
+                    <input type="text" class="quantity-input w-12 text-center bg-gray-200 dark:bg-gray-900" value="1" readonly>
+                    <button type="button" class="increase-qty px-2 bg-gray-200 dark:bg-gray-900 rounded">+</button>
+                </td>
+                <td class="border-b px-4 py-3 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    ${prodMRP.toFixed(2)}
+                </td>
+                <td class="border-b px-4 py-3 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    ${prodSell.toFixed(2)}
+                    </td>
+                <td class="border-b px-4 py-3 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white total-price">
+                    ${prodSell.toFixed(2)}
+                </td>
+                <td class="border-b px-4 py-3 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <button type="button" class="remove-product">❌</button>
+                </td>
+            `;
+
+                billingTableBody.appendChild(newRow); // Append to table
+
+                console.log("New row added to the billing table.");
+
+                // Add event listeners for increasing, decreasing, and removing products
+                newRow.querySelector('.increase-qty').addEventListener('click', function () {
+                    let quantityInput = newRow.querySelector('.quantity-input');
+                    let totalCell = newRow.querySelector('.total-price');
+
+                    quantityInput.value = parseInt(quantityInput.value) + 1;
+                    totalCell.textContent = (quantityInput.value * prodSell).toFixed(2);
+                });
+
+                newRow.querySelector('.decrease-qty').addEventListener('click', function () {
+                    let quantityInput = newRow.querySelector('.quantity-input');
+                    let totalCell = newRow.querySelector('.total-price');
+
+                    if (parseInt(quantityInput.value) > 1) {
+                        quantityInput.value = parseInt(quantityInput.value) - 1;
+                        totalCell.textContent = (quantityInput.value * prodSell).toFixed(2);
+                    }
+                });
+
+                newRow.querySelector('.remove-product').addEventListener('click', function () {
+                    newRow.remove();
+                    serialNumber--
+                    console.log("Product removed from table.");
+                });
+            });
+        });
+    });
+</script>
 {% endblock %}
