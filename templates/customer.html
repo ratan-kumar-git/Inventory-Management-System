@@ -52,7 +52,6 @@
                             <th scope="col" class="px-4 py-3 whitespace-nowrap">Name</th>
                             <th scope="col" class="px-4 py-3 whitespace-nowrap">Village</th>
                             <th scope="col" class="px-4 py-3 whitespace-nowrap">Mob-No</th>
-                            <th scope="col" class="px-4 py-3 whitespace-nowrap">Dues</th>
                             <th scope="col" class="px-4 py-3 whitespace-nowrap">Action</th>
                         </tr>
                     </thead>
@@ -81,15 +80,10 @@
                                         {{customer.customer_mob_no}}
                                     </div>
                                 </td>
-                                <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                    <div class="flex items-center">
-                                        0
-                                    </div>
-                                </td>
                                 <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white flex">
                                     <!-- View Button -->
                                     <div class="mr-2 p-2 hover:bg-slate-800 hover:rounded-md">
-                                        <a href="">
+                                        <a href="{{ url_for('customer_detail', id=customer.id)}}">
                                             <button class="flex justify-center items-center">
                                                 <svg class="h-5 w-6" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision"
                                                     text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill="orange" id="Layer_1" data-name="Layer 1"
@@ -162,7 +156,7 @@
                             {% endfor %}
                         {% else %}
                             <tr>
-                                <td colspan="8" class="text-center p-5">No Customer Found.</td>
+                                <td colspan="7" class="text-center p-5">No Customer Found.</td>
                             </tr>
                         {% endif %}
                     </tbody>

@@ -1,0 +1,97 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<main class="p-4 md:ml-64 h-auto pt-20">
+    <div class="p-5 m-2 md:m-5 bg-white rounded-lg shadow dark:bg-gray-800">
+        <!-- Header Div -->
+        <div class="flex justify-center items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
+            <h3 class="text-2xl block uppercase font-extrabold text-gray-900 dark:text-white">
+                History
+            </h3>
+        </div>
+
+        <!-- Customet Area -->
+        <div class="grid sm:grid-cols-2 pb-4 rounded-t border-b dark:border-gray-600">
+            <!-- Right Box/Div -->
+            <div class="text-lg font-medium text-gray-900 dark:text-white">
+                <label for="Customer Name" class="block">
+                    Name : {{customer.customer_name}}
+                </label>
+                {% for details, bill, product in customer_billing_details %}
+                {% if loop.first %}
+                <label for="Date" class="block">
+                    Date : {{ bill.billing_date.strftime('%d-%b-%Y') }}
+                </label>
+                {% endif %}
+                {% endfor %}
+
+            </div>
+
+            <!-- Right Box/Div -->
+            <div class="text-lg md:text-right font-medium text-gray-900 dark:text-white">
+                <label for="Customer Address" class="block">
+                    Address : {{customer.customer_village}}
+                </label>
+                <label for="customer_phone" class="block">
+                    Ph No. : {{customer.customer_mob_no}}
+                </label>
+            </div>
+        </div>
+
+        <!-- Billing Item list -->
+        <div class="mt-5 bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="billing-table  w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-sm text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-4 py-3 whitespace-nowrap">SNo.</th>
+                            <th scope="col" class="px-4 py-3 whitespace-nowrap">Date</th>
+                            <th scope="col" class="px-4 py-3 whitespace-nowrap">Product Name</th>
+                            <th scope="col" class="px-4 py-3 whitespace-nowrap">Sell Price</th>
+                            <th scope="col" class="px-4 py-3 whitespace-nowrap">Quantity</th>
+                            <th scope="col" class="px-4 py-3 whitespace-nowrap">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for details, bill, product in customer_billing_details %}
+                        <tr class="border-b text-base dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                <div class="flex items-center">
+                                    {{loop.index}}
+                                </div>
+                            </td>
+                            <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                <div class="flex items-center">
+                                    {{bill.billing_date.strftime('%d-%b-%Y')}}
+                                </div>
+                            </td>
+                            <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                <div class="flex items-center">
+                                    {{product.prod_name}}
+                                </div>
+                            </td>
+                            <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                <div class="flex items-center">
+                                    {{product.prod_sell_price}}
+                                </div>
+                            </td>
+                            <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                <div class="flex items-center">
+                                    {{details.quantity}}
+                                </div>
+                            </td>
+                            <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                <div class="flex items-center">
+                                    {{details.total_price}}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

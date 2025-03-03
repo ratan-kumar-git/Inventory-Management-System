@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, flash, session, send_file, url_for, jsonify
+from flask import Flask, render_template, request, redirect, flash, session, send_file, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
@@ -19,7 +19,7 @@ db = SQLAlchemy(app)
 def india_time():
     return datetime.datetime.now(pytz.timezone("Asia/Kolkata"))
 
-# Create Database with the name of "User"
+# User Table
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -38,7 +38,7 @@ class User(db.Model):
     def check_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password.encode('utf-8'))
 
-# Create Database for Customer
+# Customer Table
 class Customer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -52,6 +52,7 @@ class Customer(db.Model):
         self.customer_village = customer_village
         self.customer_mob_no = customer_mob_no
 
+# Product Table
 class Products(db.Model):
     prod_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -71,6 +72,7 @@ class Products(db.Model):
         self.prod_buy_price = prod_buy_price
         self.prod_min_quantity = prod_min_quantity
 
+# Billing Table
 class Billing(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
@@ -88,6 +90,7 @@ class Billing(db.Model):
         self.amount_paid = amount_paid
         self.dues = dues
 
+# BillingDetail Table
 class BillingDetails(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     billing_id = db.Column(db.Integer, db.ForeignKey('billing.id'), nullable=False)
@@ -101,12 +104,6 @@ class BillingDetails(db.Model):
 
 with app.app_context():
     db.create_all()
-
-
-# Home Page
-@app.route('/')
-def index():
-    return render_template('home.html', title='Home')
 
 
 # @app.route('/search', methods=['GET'])
@@ -129,6 +126,10 @@ def index():
 #         flash('You need to login first.', 'error')
 #         return redirect('/login')
 
+# Home Page
+@app.route('/')
+def index():
+    return render_template('home.html', title='Home')
 
 # Register Page
 @app.route('/signup', methods=['GET', 'POST'])
@@ -174,7 +175,6 @@ def login():
             flash(error, 'error')
     return render_template('login.html', title='Login Page')
 
-
 #Dashboard
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
@@ -198,14 +198,36 @@ def customers():
         customers = Customer.query.filter(Customer.user_id == user.id).paginate(page=page, per_page=10)
         total_customer = Customer.query.filter(Customer.user_id == user.id).count()
 
-        return render_template('customer.html', title='Customer', current_page='customer', 
-                               user=user, customers=customers, total_customer=total_customer, min=min, enumerate=enumerate)
+        for customer in customers:
+            billings = Billing.query.filter_by(customer_id=customer.id).all()
+
+        return render_template('customer.html', title='Customer', current_page='customer', user=user, customers=customers, total_customer=total_customer, min=min, enumerate=enumerate, billings=billings)
 
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
-    
-#Download Excel
+
+#add_customer
+@app.route('/add_customer', methods=['GET', 'POST'])
+def add_customer():
+    if 'email' in session:
+        user = User.query.filter_by(email=session['email']).first()
+        if request.method == 'POST':
+            customer_name = request.form['customer_name']
+            customer_village = request.form['customer_vill_name']
+            customer_mob_no = request.form['mobile_number']
+        
+            new_data = Customer(user_id=user.id, customer_name=customer_name, customer_village=customer_village, customer_mob_no=customer_mob_no)
+            db.session.add(new_data)
+            db.session.commit()
+            flash('Customer Added Successful.', 'success')
+
+        return render_template('add_customer.html', title='Add Customer', current_page = 'add_customer', user=user)
+    else:
+        flash('You need to login first.', 'error')
+        return redirect('/login')
+
+#Download Customer Excel
 @app.route('/download_customer', methods=['GET'])
 def download_customer():
     if 'email' in session:
@@ -231,9 +253,51 @@ def download_customer():
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
-    
 
-    
+# Customer Bill Details    
+@app.route('/customer_detail/<int:id>', methods=['GET'])
+def customer_detail(id):
+    if 'email' in session:
+        user = User.query.filter_by(email=session['email']).first()
+        customer = Customer.query.filter_by(id=id, user_id=user.id).first()
+        billings = Billing.query.filter_by(customer_id=customer.id).all()
+        total_dues = sum(billing.dues for billing in billings)
+
+        return render_template('customer_detail.html', title='Customer Detail', current_page='customer', user=user, customer=customer, billings=billings, total_dues=total_dues)
+    else:
+        flash('You need to login first.', 'error')
+        return redirect('/login')
+
+# Customer Billing History Details     
+@app.route('/customer_billing_detail/<int:custo_id>/<int:bill_id>', methods=['GET'])
+def customer_billing_detail(custo_id, bill_id):
+    if 'email' in session:
+        user = User.query.filter_by(email=session['email']).first()
+        customer = Customer.query.filter_by(id=custo_id, user_id=user.id).first()
+
+        # Join BillingDetails with Billing and Products to fetch required details in one query
+        customer_billing_details = (
+            db.session.query(BillingDetails, Billing, Products)
+            .join(Billing, BillingDetails.billing_id == Billing.id)
+            .join(Products, BillingDetails.product_id == Products.prod_id)
+            .filter(Billing.id == bill_id)
+            .all()
+        )
+        print(customer_billing_details)
+
+        return render_template(
+            'customer_bill_detail.html',
+            title='Customer Detail',
+            current_page='customer',
+            user=user,
+            customer=customer,
+            customer_billing_details=customer_billing_details
+        )
+    else:
+        flash('You need to login first.', 'error')
+        return redirect('/login')
+
+# Delete Customer 
 @app.route('/delete_customer/<int:id>', methods=['GET'])
 def delete_customer(id):
     if 'email' in session:
@@ -261,27 +325,6 @@ def delete_customer(id):
         flash('You need to login first.', 'error')
         return redirect('/login')
 
-
-#add_customer
-@app.route('/add_customer', methods=['GET', 'POST'])
-def add_customer():
-    if 'email' in session:
-        user = User.query.filter_by(email=session['email']).first()
-        if request.method == 'POST':
-            customer_name = request.form['customer_name']
-            customer_village = request.form['customer_vill_name']
-            customer_mob_no = request.form['mobile_number']
-        
-            new_data = Customer(user_id=user.id, customer_name=customer_name, customer_village=customer_village, customer_mob_no=customer_mob_no)
-            db.session.add(new_data)
-            db.session.commit()
-            flash('Customer Added Successful.', 'success')
-
-        return render_template('add_customer.html', title='Add Customer', current_page = 'add_customer', user=user)
-    else:
-        flash('You need to login first.', 'error')
-        return redirect('/login')
-
 #Products
 @app.route('/products', methods=['GET', 'POST'])
 def products():
@@ -302,8 +345,31 @@ def products():
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
-    
-#Download Excel
+
+#Add Products
+@app.route('/add_product', methods=['GET', 'POST'])
+def add_products():
+    if 'email' in session:
+        user = User.query.filter_by(email=session['email']).first()
+
+        if request.method == 'POST':
+            prod_name = request.form['product_name']
+            prod_quantity = request.form['product_quantity']
+            prod_sell_price = request.form['selling_price']
+            prod_mrp = request.form['mrp']
+            prod_buy_price = request.form['purches_price']
+            prod_min_quantity = request.form['min_quantity']
+        
+            new_data = Products(user_id=user.id, prod_name=prod_name, prod_quantity=prod_quantity, prod_sell_price= prod_sell_price, prod_mrp=prod_mrp, prod_buy_price=prod_buy_price,  prod_min_quantity= prod_min_quantity)
+            db.session.add(new_data)
+            db.session.commit()
+            flash('Product Added Successful.', 'success')
+        return render_template('add_product.html', title='Add Products', current_page = 'add_product', user=user)
+    else:
+        flash('You need to login first.', 'error')
+        return redirect('/login')
+
+#Download Product Excel
 @app.route('/download_excel', methods=['GET'])
 def download_excel():
     if 'email' in session:
@@ -332,29 +398,7 @@ def download_excel():
         flash('You need to login first.', 'error')
         return redirect('/login')
 
-#Products
-@app.route('/add_product', methods=['GET', 'POST'])
-def add_products():
-    if 'email' in session:
-        user = User.query.filter_by(email=session['email']).first()
-
-        if request.method == 'POST':
-            prod_name = request.form['product_name']
-            prod_quantity = request.form['product_quantity']
-            prod_sell_price = request.form['selling_price']
-            prod_mrp = request.form['mrp']
-            prod_buy_price = request.form['purches_price']
-            prod_min_quantity = request.form['min_quantity']
-        
-            new_data = Products(user_id=user.id, prod_name=prod_name, prod_quantity=prod_quantity, prod_sell_price= prod_sell_price, prod_mrp=prod_mrp, prod_buy_price=prod_buy_price,  prod_min_quantity= prod_min_quantity)
-            db.session.add(new_data)
-            db.session.commit()
-            flash('Product Added Successful.', 'success')
-        return render_template('add_product.html', title='Add Products', current_page = 'add_product', user=user)
-    else:
-        flash('You need to login first.', 'error')
-        return redirect('/login')
-    
+# Edit product 
 @app.route('/edit_product/<int:prod_id>', methods=['GET'])
 def edit_product(prod_id):
     if 'email' in session:
@@ -369,8 +413,8 @@ def edit_product(prod_id):
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
-    
 
+# Update Product
 @app.route('/update_data/<int:prod_id>', methods=['POST'])
 def update_data(prod_id):
     if 'email' in session:
@@ -396,7 +440,7 @@ def update_data(prod_id):
         flash('You need to login first.', 'error')
         return redirect('/login')
 
-
+# Delete product
 @app.route('/delete_product/<int:prod_id>', methods=['GET'])
 def delete_product(prod_id):
     if 'email' in session:
@@ -423,8 +467,6 @@ def delete_product(prod_id):
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
-
-
 
 #Billing
 @app.route('/billing', methods=['GET', 'POST'])
@@ -520,8 +562,7 @@ def prod_billing():
     db.session.commit()
     return jsonify({"status": "success", "message": "Billing successful!"}), 200
 
-
-
+# Get Data During Billing
 @app.route('/get_customer_details/<int:customer_id>', methods=['GET'])
 def get_customer_details(customer_id):
     customer = db.session.get(Customer, customer_id)
