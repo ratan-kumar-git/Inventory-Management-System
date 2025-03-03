@@ -433,13 +433,94 @@ def billing():
         user = User.query.filter_by(email=session['email']).first()
         customers = Customer.query.filter_by(user_id=user.id).all()
         products = Products.query.filter_by(user_id=user.id).all()
-
-
         return render_template('billing.html', title='Billing', current_page = 'billing', user=user, customers=customers, products=products)
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
     
+#Billing_process
+@app.route('/prod_billing', methods=['GET', 'POST'])
+def prod_billing():
+    if 'email' not in session:
+        flash('You need to login first.', 'error')
+        return redirect('/login')
+
+    user = User.query.filter_by(email=session['email']).first()
+    data = request.get_json()
+    print(data)
+
+    if not data:
+        return jsonify({"status": "error", "message": "No JSON received"}), 400
+
+    # Extract and validate data
+    try:
+        customer_id = data.get('customer_id')
+        product_list = data.get('products', [])
+        amount_paid = data.get('amount_paid')
+
+        # Checking null iteam 
+        if not customer_id:
+            return jsonify({"status": "error", "message": "Please Select Customer!"}), 400
+
+        if not product_list:
+            return jsonify({"status": "error", "message": "Please select at least one product!"}), 400
+        
+        if not amount_paid:
+            return jsonify({"status": "error", "message": "Please Enter Amount"}), 400
+        
+        customer_id = int(data.get('customer_id'))
+        amount_paid = float(data.get('amount_paid'))
+        
+        if amount_paid < 0:
+            return jsonify({"status": "error", "message": "Amount paid cannot be negative!"}), 400
+        
+    except (ValueError, TypeError):
+        return jsonify({"status": "error", "message": "Invalid data format!"}), 400
+
+    # Billing Process
+    total_amount = 0
+    india_time = datetime.datetime.now(pytz.timezone('Asia/Kolkata'))
+    billing = Billing(
+        customer_id=customer_id,
+        billing_date=india_time,
+        total_amount=0,
+        amount_paid=amount_paid,
+        dues=0
+    )
+    db.session.add(billing)
+    db.session.flush()
+
+    for product_data in product_list:
+        product_id = product_data['prodId']
+        quantity = product_data['quantity']
+
+        product = Products.query.filter_by(user_id=user.id, prod_id=product_id).first()
+
+        if product and product.prod_quantity >= quantity:
+            total_price = product.prod_sell_price * quantity
+            total_amount += total_price
+
+            product.prod_quantity -= quantity
+
+            bill_detail = BillingDetails(
+                billing_id=billing.id,
+                product_id=product.prod_id,
+                quantity=quantity,
+                total_price=total_price
+            )
+            db.session.add(bill_detail)
+        else:
+            db.session.rollback()
+            return jsonify({"status": "error", "message": f"Insufficient stock for {product.prod_name}!"}), 400
+
+    # Update total amount & dues
+    billing.total_amount = total_amount
+    billing.dues = total_amount - amount_paid
+
+    db.session.commit()
+    return jsonify({"status": "success", "message": "Billing successful!"}), 200
+
+
 
 @app.route('/get_customer_details/<int:customer_id>', methods=['GET'])
 def get_customer_details(customer_id):
@@ -466,69 +547,6 @@ def get_customer_details(customer_id):
             'customer_dues': dues
         })
     return jsonify({'error': 'Customer not found'}), 404
-
-
-@app.route('/admin/billing', methods=['GET', 'POST'])
-def create_bill():
-    if 'email' in session:
-        user = User.query.filter_by(email=session['email']).first()
-
-        if request.method == 'POST':
-            print(request.form)  # Debugging Step
-
-            customer_id = request.form.get('customer_id')
-            product_ids = request.form.getlist('product_id')  # ✅ Fix applied
-            amount_paid = float(request.form.get('amount_paid', 0))
-
-            if not customer_id or not product_ids:
-                flash("Please select a customer and at least one product!", "danger")
-                return redirect(url_for('create_bill'))
-
-            # Process Billing
-            total_amount = 0
-            billing = Billing(customer_id=customer_id, billing_date=india_time, total_amount=0, amount_paid=amount_paid, dues=0)
-            db.session.add(billing)
-            db.session.flush()  # Get billing ID before committing
-
-            for product_id in product_ids:
-                quantity = int(request.form.get(f'quantity_{product_id}', 0))  # ✅ Fix applied
-                product = db.session.get(Products, product_id)
-
-                if product and product.prod_quantity >= quantity:
-                    total_price = product.prod_sell_price * quantity
-                    total_amount += total_price
-
-                    # Deduct stock
-                    product.prod_quantity -= quantity
-
-                    # Add to BillingDetails
-                    bill_detail = BillingDetails(
-                        billing_id=billing.id,
-                        product_id=product.prod_id,
-                        quantity=quantity,
-                        total_price=total_price
-                    )
-                    db.session.add(bill_detail)
-                else:
-                    flash(f"Insufficient stock for {product.prod_name}!", "danger")
-                    return redirect(url_for('create_bill'))
-
-            # Calculate dues
-            billing.total_amount = total_amount
-            billing.dues = total_amount - amount_paid
-
-            db.session.commit()
-            flash("Billing successful!", "success")
-            return redirect(url_for('create_bill'))
-        
-        customers = Customer.query.filter_by(user_id=user.id).all()
-        products = Products.query.filter_by(user_id=user.id).all()
-        return render_template('billing_org.html', customers=customers, products=products)
-    
-    else:
-        flash('You need to login first.', 'error')
-        return redirect('/login')
-
 
 #Invoice
 @app.route('/invoice', methods=['GET', 'POST'])
