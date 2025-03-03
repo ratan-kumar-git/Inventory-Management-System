@@ -444,10 +444,11 @@ def billing():
 @app.route('/get_customer_details/<int:customer_id>', methods=['GET'])
 def get_customer_details(customer_id):
     customer = db.session.get(Customer, customer_id)
-    billing =  Billing.query.filter_by(customer_id = customer_id).first()
+    billings =  Billing.query.filter_by(customer_id = customer_id).all()
 
-    if billing:
-        dues = f"₹{billing.dues}"
+    if billings:
+        total_dues = sum(billing.dues for billing in billings)  # Summing dues
+        dues = f"₹{total_dues}"
     else:
         dues = "₹0"
 

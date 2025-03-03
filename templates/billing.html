@@ -167,6 +167,9 @@
                         </thead>
                         <tbody>
                             <!-- Items will be added here dynamically -->
+                             <tr>
+                                
+                             </tr>
                         </tbody>
                     </table>
                 </div>
@@ -231,6 +234,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         const billingTableBody = document.querySelector('.billing-table tbody');
+        const billingTable = document.querySelector('.billing-table');
         let serialNumber = 1;
 
         if (!billingTableBody) {
@@ -238,9 +242,17 @@
             return;
         }
 
+        function updateGrandTotal() {
+            let total = 0;
+            document.querySelectorAll('.total-price').forEach(cell => {
+                total += parseFloat(cell.textContent) || 0;
+            });
+            document.querySelector('.grand-total').textContent = total.toFixed(2);
+        }
+
         document.querySelectorAll('.add-to-bill').forEach(button => {
             button.addEventListener('click', function (event) {
-                event.preventDefault(); // Prevent page refresh
+                event.preventDefault();
 
                 const prodId = this.getAttribute('data-prod-id');
                 const prodName = this.getAttribute('data-prod-name');
@@ -252,20 +264,16 @@
                     return;
                 }
 
-                console.log("Product Added:", prodId, prodName, prodMRP, prodSell);
-
-                // Check if product already exists in the table
                 let existingRow = billingTableBody.querySelector(`tr[data-prod-id="${prodId}"]`);
                 if (existingRow) {
                     let quantityInput = existingRow.querySelector('.quantity-input');
                     let totalCell = existingRow.querySelector('.total-price');
-
                     quantityInput.value = parseInt(quantityInput.value) + 1;
                     totalCell.textContent = (quantityInput.value * prodSell).toFixed(2);
+                    updateGrandTotal();
                     return;
                 }
 
-                // Create a new row for the new product
                 const newRow = document.createElement('tr');
                 newRow.setAttribute('data-prod-id', prodId);
                 newRow.innerHTML = `
@@ -293,37 +301,50 @@
                     <button type="button" class="remove-product">❌</button>
                 </td>
             `;
+                billingTableBody.appendChild(newRow);
 
-                billingTableBody.appendChild(newRow); // Append to table
-
-                console.log("New row added to the billing table.");
-
-                // Add event listeners for increasing, decreasing, and removing products
                 newRow.querySelector('.increase-qty').addEventListener('click', function () {
                     let quantityInput = newRow.querySelector('.quantity-input');
                     let totalCell = newRow.querySelector('.total-price');
-
                     quantityInput.value = parseInt(quantityInput.value) + 1;
                     totalCell.textContent = (quantityInput.value * prodSell).toFixed(2);
+                    updateGrandTotal();
                 });
 
                 newRow.querySelector('.decrease-qty').addEventListener('click', function () {
                     let quantityInput = newRow.querySelector('.quantity-input');
                     let totalCell = newRow.querySelector('.total-price');
-
                     if (parseInt(quantityInput.value) > 1) {
                         quantityInput.value = parseInt(quantityInput.value) - 1;
                         totalCell.textContent = (quantityInput.value * prodSell).toFixed(2);
+                        updateGrandTotal();
                     }
                 });
 
                 newRow.querySelector('.remove-product').addEventListener('click', function () {
                     newRow.remove();
-                    serialNumber--
-                    console.log("Product removed from table.");
+                    serialNumber--;
+                    updateGrandTotal();
                 });
+
+                updateGrandTotal();
             });
         });
+
+        const grandTotalRow = document.createElement('tr');
+        grandTotalRow.innerHTML = `
+        <td colspan="5" class="text-right px-4 py-3 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white"><strong>Grand Total:</strong></td>
+        <td colspan="2" class="grand-total px-4 py-3 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">0.00</td>
+    `;
+        billingTable.appendChild(grandTotalRow);
+
+        const amountPaidRow = document.createElement('tr');
+        amountPaidRow.innerHTML = `
+        <td colspan="5" class="text-right px-4 py-3 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white"><strong>Amount Paid:</strong></td>
+        <td colspan="2" class="px-4"><input type="text" id="amount-paid" class="amount-paid p-1 rounded text-base font-medium bg-gray-200 dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Enter amount"></td>
+    `;
+        billingTable.appendChild(amountPaidRow);
     });
+
 </script>
 {% endblock %}
