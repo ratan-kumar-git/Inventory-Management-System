@@ -52,7 +52,8 @@
                             <th scope="col" class="px-4 py-3 whitespace-nowrap">Name</th>
                             <th scope="col" class="px-4 py-3 whitespace-nowrap">Village</th>
                             <th scope="col" class="px-4 py-3 whitespace-nowrap">Mob-No</th>
-                            <th scope="col" class="px-4 py-3 whitespace-nowrap">Action</th>
+                            <th scope="col" class="px-4 py-3 whitespace-nowrap">History</th>
+                            <th scope="col" class="px-4 py-3 whitespace-nowrap">Delete</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -80,9 +81,9 @@
                                         {{customer.customer_mob_no}}
                                     </div>
                                 </td>
-                                <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white flex">
+                                <td class="px-4 w-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                     <!-- View Button -->
-                                    <div class="mr-2 p-2 hover:bg-slate-800 hover:rounded-md">
+                                    <div class="flex items-center justify-center mr-2 p-2 hover:bg-slate-800 hover:rounded-md">
                                         <a href="{{ url_for('customer_detail', id=customer.id)}}">
                                             <button class="flex justify-center items-center">
                                                 <svg class="h-5 w-6" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision"
@@ -95,10 +96,11 @@
                                             </button>
                                         </a>
                                     </div>
-
+                                </td>
+                                <td class="px-4 w-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                     <!-- Delete Button -->
-                                    <div class="flex justify-center p-2 hover:bg-slate-800 hover:rounded-md">
-                                        <button  id="deleteButton-{{ customer.id }}" data-modal-target="deleteModal-{{ customer.id }}"
+                                    <div class="flex items-center justify-center mr-2 p-2 hover:bg-slate-800 hover:rounded-md">
+                                        <button class="flex justify-center items-center" id="deleteButton-{{ customer.id }}" data-modal-target="deleteModal-{{ customer.id }}"
                                             data-modal-toggle="deleteModal-{{ customer.id}}">
                                             <svg class="text-gray-400 dark:text-gray-500 w-6 h-5" aria-hidden="true"
                                                 fill="red" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <title>Delete</title>

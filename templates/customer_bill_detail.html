@@ -7,7 +7,7 @@
         <!-- Header Div -->
         <div class="flex justify-center items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
             <h3 class="text-2xl block uppercase font-extrabold text-gray-900 dark:text-white">
-                History
+                Bill of {{customer.customer_name}}
             </h3>
         </div>
 
@@ -46,47 +46,70 @@
                     <thead class="text-sm text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
                             <th scope="col" class="px-4 py-3 whitespace-nowrap">SNo.</th>
-                            <th scope="col" class="px-4 py-3 whitespace-nowrap">Date</th>
                             <th scope="col" class="px-4 py-3 whitespace-nowrap">Product Name</th>
-                            <th scope="col" class="px-4 py-3 whitespace-nowrap">Sell Price</th>
+                            <th scope="col" class="px-4 py-3 whitespace-nowrap">Price</th>
                             <th scope="col" class="px-4 py-3 whitespace-nowrap">Quantity</th>
                             <th scope="col" class="px-4 py-3 whitespace-nowrap">Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for details, bill, product in customer_billing_details %}
-                        <tr class="border-b text-base dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                <div class="flex items-center">
-                                    {{loop.index}}
-                                </div>
-                            </td>
-                            <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                <div class="flex items-center">
-                                    {{bill.billing_date.strftime('%d-%b-%Y')}}
-                                </div>
-                            </td>
-                            <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                <div class="flex items-center">
-                                    {{product.prod_name}}
-                                </div>
-                            </td>
-                            <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                <div class="flex items-center">
-                                    {{product.prod_sell_price}}
-                                </div>
-                            </td>
-                            <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                <div class="flex items-center">
-                                    {{details.quantity}}
-                                </div>
-                            </td>
-                            <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                <div class="flex items-center">
-                                    {{details.total_price}}
-                                </div>
-                            </td>
-                        </tr>
+                            <tr class="border-b text-base dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    <div class="flex items-center">
+                                        {{loop.index}}
+                                    </div>
+                                </td>
+                                <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    <div class="flex items-center">
+                                        {{product.prod_name}}
+                                    </div>
+                                </td>
+                                <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    <div class="flex items-center">
+                                        {{product.prod_sell_price}}
+                                    </div>
+                                </td>
+                                <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    <div class="flex items-center">
+                                        {{details.quantity}}
+                                    </div>
+                                </td>
+                                <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    <div class="flex items-center">
+                                        {{details.total_price}}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+                        {% for details, bill, product in customer_billing_details %}
+                            {% if loop.first %}
+                                <tr>
+                                    <td colspan="4" class="text-right px-4 pt-3 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        <strong>Grand Total:</strong>
+                                    </td>
+                                    <td colspan="2" class="grand-total px-4 pt-3 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        {{ bill.total_amount}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-right px-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        <strong>Amount paid:</strong>
+                                    </td>
+                                    <td colspan="2" class="grand-total px-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        {{ bill.amount_paid}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-right px-4 pb-3 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        <strong>Dues:</strong>
+                                    </td>
+                                    <td colspan="2" class="grand-total px-4 pb-3 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        {{bill.total_amount - bill.amount_paid}}
+                                    </td>
+                                </tr>
+                            {% endif %}
                         {% endfor %}
                     </tbody>
                 </table>
