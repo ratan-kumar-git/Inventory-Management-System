@@ -195,7 +195,7 @@ def customers():
         page = request.args.get('page', 1, type=int)
         
         # Paginate products (10 per page)
-        customers = Customer.query.filter(Customer.user_id == user.id).paginate(page=page, per_page=10)
+        customers = Customer.query.filter(Customer.user_id == user.id).order_by(Customer.id.desc()).paginate(page=page, per_page=10)
         total_customer = Customer.query.filter(Customer.user_id == user.id).count()
 
         for customer in customers:
@@ -336,7 +336,7 @@ def products():
         page = request.args.get('page', 1, type=int)
         
         # Paginate products (10 per page)
-        products = Products.query.filter(Products.user_id == user.id).paginate(page=page, per_page=10)
+        products = Products.query.filter(Products.user_id == user.id).order_by(Products.prod_id.desc()).paginate(page=page, per_page=10)
         total_product = Products.query.filter(Products.user_id == user.id).count()
 
         return render_template('product.html', title='Products', current_page='products', 
@@ -590,11 +590,19 @@ def get_customer_details(customer_id):
     return jsonify({'error': 'Customer not found'}), 404
 
 #Invoice
-@app.route('/invoice', methods=['GET', 'POST'])
-def invoice():
+@app.route('/billing_history', methods=['GET', 'POST'])
+def billing_history():
     if 'email' in session:
         user = User.query.filter_by(email=session['email']).first()
-        return render_template('invoice.html', title='Invoice', current_page = 'invoice', user=user)
+        customer_billing = (
+            db.session.query(Customer, Billing)
+            .join(Billing, Billing.customer_id == Customer.id)
+            .filter(Customer.user_id == user.id)
+            .order_by(Billing.id.desc())
+            .all()
+        )
+
+        return render_template('billing_history.html', title='Billing History', current_page = 'billing_history', user=user, customer_billing=customer_billing)
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
