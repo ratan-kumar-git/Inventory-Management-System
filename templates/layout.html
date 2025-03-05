@@ -37,7 +37,8 @@
 
                     <!-- Logo  -->
                     <a href="/" class="flex items-center justify-between mr-4">
-                        <img src="{{ url_for('static', filename='images/kishan-moters-logo.png')}}" class="mr-3 h-10 rounded-lg" alt="Logo" />
+                        <img src="{{ url_for('static', filename='images/kishan-moters-logo.png')}}"
+                            class="mr-3 h-10 rounded-lg" alt="Logo" />
                         <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Kishan Moters
                         </span>
                     </a>
@@ -60,10 +61,6 @@
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                 placeholder="Search" />
                         </div>
-                        <!-- Suggestions Dropdown
-                        <div id="suggestions"
-                        class="absolute top-full left-0 w-full max-h-60 overflow-y-auto z-50 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg shadow-lg hidden">
-                        </div> -->
                     </form>
 
                 </div>
@@ -85,36 +82,55 @@
                         class="flex mx-3 text-sm bg-gray-800 rounded-full md:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
                         id="user-menu-button" aria-expanded="false" data-dropdown-toggle="dropdown">
                         <span class="sr-only">Open user menu</span>
-                        <img class="w-8 h-8 rounded-full"
-                            src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/michael-gough.png"
-                            alt="user photo" />
+                        <svg class="w-8 h-8 rounded-full  text-gray-50 dark:text-gray-400"
+                            xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision"
+                            text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd"
+                            clip-rule="evenodd" viewBox="0 0 512 512">
+                            <path fill="currentColor" fill-rule="nonzero"
+                                d="M256 0c68 0 132.89 26.95 180.96 75.04C485.05 122.99 512 188.11 512 256c0 68-26.95 132.89-75.04 180.96-23.49 23.56-51.72 42.58-83.15 55.6C323.59 505.08 290.54 512 256 512c-34.55 0-67.6-6.92-97.83-19.44l-.07-.03c-31.25-12.93-59.42-31.93-83.02-55.54l-.07-.07C26.9 388.82 0 324.03 0 256 0 116.78 112.74 0 256 0zm-52.73 332.87a67.668 67.668 0 01-5.6-6.74c-10.84-14.83-20.55-31.61-30.32-47.22-7.06-10.41-10.78-19.71-10.78-27.14 0-7.95 4.22-17.23 12.64-19.34-1.11-15.99-1.49-31.77-.74-48.88.37-4.08 1.12-8.17 2.23-12.27 4.84-17.1 16.73-30.86 31.61-40.15 5.2-3.35 10.78-5.94 17.1-8.18 10.78-4.09 5.57-20.45 17.48-20.82 27.88-.74 73.61 23.06 91.46 42.38 10.41 11.16 17.1 26.03 18.22 45.74l-1.12 44.03c5.2 1.49 8.55 4.84 10.04 10.04 1.49 5.95 0 14.13-5.2 25.67 0 .36-.38.36-.38.74-11.47 18.91-23.39 40.77-36.57 58.33-6.63 8.83-12.07 7.26-6.42 15.74 26.88 36.96 79.9 31.82 112.61 56.44 35.73-40.16 55.15-91.48 55.15-145.24 0-58.34-22.8-113.35-64.07-154.61v-.08C369.44 60.1 314.23 37.32 256 37.32 134.4 37.32 37.32 135.83 37.32 256c0 53.85 19.41 105.03 55.15 145.24 32.72-24.62 85.73-19.48 112.61-56.44 4.68-7.01 3.48-6.33-1.81-11.93z">
+                            </path>
+                        </svg>
                     </button>
                     <!-- User Dropdown menu -->
                     <div class="hidden z-50 my-4 w-56 text-base list-none bg-white rounded-xl divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
                         id="dropdown">
+                        {% if 'email' in session %}
                         <div class="py-3 px-4">
                             <span class="block text-sm font-semibold text-gray-900 dark:text-white">{{user.name}}</span>
                             <span class="block text-sm text-gray-900 truncate dark:text-white">{{user.email}}</span>
                         </div>
-                        <ul class="py-1 text-gray-700 dark:text-gray-300" aria-labelledby="dropdown">
-                            <li>
-                                <a href="#"
-                                    class="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white">My
-                                    profile</a>
-                            </li>
-                            <li>
-                                <a href="#"
-                                    class="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white">Account
-                                    settings</a>
-                            </li>
-                        </ul>
-                        <ul class="py-1 text-gray-700 dark:text-gray-300" aria-labelledby="dropdown">
-                            <li>
-                                <a href="/logout"
-                                    class="block py-2 px-4 text-sm hover:bg-gray-100 hover:rounded-b-xl dark:hover:bg-gray-600 dark:hover:text-white">Logout
-                                </a>
-                            </li>
-                        </ul>
+                        <li>
+                            <a href="/about_us"
+                                class="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white">My
+                                profile</a>
+                        </li>
+                        <li>
+                            <a href="#"
+                                class="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white">Account
+                                settings</a>
+                        </li>
+                        <li>
+                            <a href="/logout"
+                                class="block py-2 px-4 text-sm hover:bg-gray-100 hover:rounded-b-xl dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white">Logout
+                            </a>
+                        </li>
+                        {% else %}
+                        <div class="py-3 px-4">
+                            <span class="block text-sm font-semibold text-gray-900 dark:text-white">You Need to
+                                Signup/Login
+                            </span>
+                        </div>
+                        <li>
+                            <a href="/signup"
+                                class="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white">
+                                Signup</a>
+                        </li>
+                        <li>
+                            <a href="/login"
+                                class="block py-2 px-4 text-sm hover:bg-gray-100 hover:rounded-b-xl dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white">
+                                Login</a>
+                        </li>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -124,7 +140,8 @@
         <aside
             class="fixed top-0 left-0 z-40 w-64 h-screen pt-14 transition-transform -translate-x-full bg-white border-r border-gray-200 md:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
             aria-label="Sidenav" id="drawer-navigation">
-            <div class="overflow-y-auto py-5 px-3 h-full bg-white dark:bg-gray-800">
+            <div class="overflow-y-auto py-5 px-3 h-[90%] bg-white dark:bg-gray-800">
+                <!-- Search For Mobile responsive -->
                 <form action="#" method="GET" class="md:hidden mb-2">
                     <label for="sidebar-search" class="sr-only">Search</label>
                     <div class="relative">
@@ -141,8 +158,31 @@
                             placeholder="Search" />
                     </div>
                 </form>
+                {% if 'email' in session %}
                 <!-- Sidebar Menu List 1 -->
                 <ul class="space-y-2">
+                    <!-- Home -->
+                    <li>
+                        <a href="/" {% if current_page=='home' %}
+                            class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white bg-gray-100 dark:bg-gray-700 group"
+                            {% else %}
+                            class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                            {% endif %}>
+
+                            <svg class="w-6 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                                version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                                xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 122.88 112.07"
+                                style="enable-background:new 0 0 122.88 112.07" xml:space="preserve"
+                                fill="currentColor">
+                                <g>
+                                    <path class="st0"
+                                        d="M61.44,0L0,60.18l14.99,7.87L61.04,19.7l46.85,48.36l14.99-7.87L61.44,0L61.44,0z M18.26,69.63L18.26,69.63 L61.5,26.38l43.11,43.25h0v0v42.43H73.12V82.09H49.49v29.97H18.26V69.63L18.26,69.63L18.26,69.63z">
+                                    </path>
+                                </g>
+                            </svg>
+                            <span class="ml-3">Home</span>
+                        </a>
+                    </li>
                     <!-- Dashboard -->
                     <li>
                         <a href="/dashboard" {% if current_page=='dashboard' %}
@@ -171,7 +211,8 @@
                             class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                             {% endif %}>
                             <svg class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                                fill="currentColor" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.88 114.11">
+                                fill="currentColor" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 122.88 114.11">
                                 <title>business-men</title>
                                 <path
                                     d="M35.68,43.4c.6-1.65,1.43-2.46,2.48-2.75-.37-7.2.81-18.52-6.55-20.75C46.2,1.87,63-7.94,75.65,8.1c14.51.76,20.73,22.79,10.75,33.66a4.47,4.47,0,0,1,2.25.47,3.55,3.55,0,0,1,1.73,2.11A6.38,6.38,0,0,1,90.29,48L88.4,53.33a3.94,3.94,0,0,1-1.2,2,3.52,3.52,0,0,1-2.58.63,4.78,4.78,0,0,1-.53-.06c-.12,6-3,8.76-6.9,12.37l-1.47,1.4c-3.89,3.75-8.14,5.57-12.46,5.57s-8.79-1.88-12.88-5.52l-1.44-1.25C45.17,65.2,42,62.49,41.43,55.89H41.1a4.61,4.61,0,0,1-2.22-.59,6,6,0,0,1-2.43-3,13.57,13.57,0,0,1-1-4.44c0-.46,0-1.38,0-2.26a9.37,9.37,0,0,1,.21-2.26ZM44.8,75.1,54,102.18,58.64,86.1l-2.27-2.48q-1.53-2.24-.68-3.92c1.23-2.43,3.77-2,6.15-2s5.57-.47,6.35,2.64a4.15,4.15,0,0,1-.8,3.26L65.12,86.1l4.63,16.08L78.08,75.1c6,5.41,27.18,6.5,33.8,10.19A17.51,17.51,0,0,1,117.39,90c3.79,5,4.11,12.09,5.49,18.22-.34,3.58-2.37,5.64-6.36,5.94H6.36c-4-.3-6-2.37-6.36-5.94C1.38,102,1.71,95,5.49,90A17.15,17.15,0,0,1,11,85.29c6.63-3.69,27.79-4.78,33.8-10.19ZM73.7,21.6c-7.38,7.49-16.62,5.18-23.13,8.13-.38.23-.77.49-1.17.76a10.62,10.62,0,0,0-4.18,5.22,13.12,13.12,0,0,0-.17,7.14,1.49,1.49,0,0,1,0,.86,1.45,1.45,0,0,1-1.85.87c-1.3-.47-4.06-1.8-4.72-.28,0,.35-.06.88-.08,1.44,0,.79,0,1.62,0,2a10.53,10.53,0,0,0,.75,3.45,3.34,3.34,0,0,0,1.2,1.58,1.78,1.78,0,0,0,.82.21,4.05,4.05,0,0,0,1.18-.2,1.63,1.63,0,0,1,.44-.08,1.45,1.45,0,0,1,1.47,1.41c.16,6.56,3.07,9.06,6.61,12.11l1.47,1.28c3.56,3.16,7.3,4.79,11,4.79s7.13-1.55,10.45-4.76l1.5-1.42c3.71-3.49,6.44-6.06,5.92-12.31a1.39,1.39,0,0,1,.24-.92,1.44,1.44,0,0,1,2-.41,3,3,0,0,0,1.4.54,2.5,2.5,0,0,0,.62,0,2.94,2.94,0,0,0,.28-.67l1.84-5.22a3.7,3.7,0,0,0,.12-1.93.75.75,0,0,0-.34-.44,1.78,1.78,0,0,0-.91-.12,5.11,5.11,0,0,0-2.59,1.09,1.45,1.45,0,0,1-2.3-1.4c1.36-8,.74-13.15-1-16.68a14.19,14.19,0,0,0-6.42-6.38l-.41.31ZM58.43,37.12c1.46.54,1.76,1.76,1,2.22-1,.54-2.16-.26-3.1-.56-2.44-.78-5.34-.87-7.44.44a11.68,11.68,0,0,0-1.71,1.36,6,6,0,0,1,1-2.09c2.11-2.67,7.43-2.82,10.26-1.37Zm9.2,0c-1.46.54-1.77,1.76-.95,2.22s2.16-.26,3.09-.56c2.44-.78,5.33-.87,7.44.44a11.68,11.68,0,0,1,1.71,1.36,5.78,5.78,0,0,0-1-2.09c-2.11-2.67-7.43-2.82-10.25-1.37ZM50.45,42.34a.64.64,0,0,1-.38-.42.71.71,0,0,1,.38-.87,10.07,10.07,0,0,1,7.27,0,.71.71,0,0,1,.39.85.58.58,0,0,1-.75.44q-.6-.21-1.2-.36a1.74,1.74,0,0,1,.06.45,1.68,1.68,0,1,1-3.36,0,1.66,1.66,0,0,1,.12-.64,9.09,9.09,0,0,0-1.79.42c-.24.08-.48.23-.74.13Zm19.89-.45a1.62,1.62,0,0,0-.1.54,1.69,1.69,0,1,0,3.2-.74,10.68,10.68,0,0,1,2.22.49.6.6,0,0,0,.74-.47.72.72,0,0,0-.41-.85,11.89,11.89,0,0,0-3.64-.59,11.17,11.17,0,0,0-3.59.6.71.71,0,0,0-.41.85.6.6,0,0,0,.74.46c.4-.13.8-.24,1.19-.33.1,0,.08,0,.06,0ZM60.89,55.61a.84.84,0,0,1,.16-.33.79.79,0,0,1,1.1-.1,1.77,1.77,0,0,0,1.12.5,1.83,1.83,0,0,0,1.18-.5.77.77,0,1,1,1,1.19,3.31,3.31,0,0,1-2.18.86,3,3,0,0,1-1.8-.62c-.34-.24-.67-.5-.56-1Zm-2.62,6.94a.81.81,0,0,1,1.19-.84,7.93,7.93,0,0,0,3.73,1,7.48,7.48,0,0,0,3.67-1,.82.82,0,0,1,.8,1.44,9,9,0,0,1-4.46,1.2,9.31,9.31,0,0,1-3.92-.91c-.41-.19-.93-.37-1-.89Z" />
@@ -336,12 +377,110 @@
                         </a>
                     </li>
                 </ul>
+                {% else %}
+                <ul class="space-y-2">
+                    <!-- Home -->
+                    <li>
+                        <a href="/" {% if current_page=='home' %}
+                            class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white bg-gray-100 dark:bg-gray-700 group"
+                            {% else %}
+                            class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                            {% endif %}>
+
+                            <svg class="w-6 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                                version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                                xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 122.88 112.07"
+                                style="enable-background:new 0 0 122.88 112.07" xml:space="preserve"
+                                fill="currentColor">
+                                <g>
+                                    <path class="st0"
+                                        d="M61.44,0L0,60.18l14.99,7.87L61.04,19.7l46.85,48.36l14.99-7.87L61.44,0L61.44,0z M18.26,69.63L18.26,69.63 L61.5,26.38l43.11,43.25h0v0v42.43H73.12V82.09H49.49v29.97H18.26V69.63L18.26,69.63L18.26,69.63z">
+                                    </path>
+                                </g>
+                            </svg>
+                            <span class="ml-3">Home</span>
+                        </a>
+                    </li>
+                    <!-- About Us -->
+                    <li>
+                        <a href="/about_us" {% if current_page=='about_us' %}
+                            class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 bg-gray-100 dark:bg-gray-700 dark:text-white group"
+                            {% else %}
+                            class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
+                            {% endif %}>
+
+                            <svg class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                                fill="currentColor" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 122.88 74.52">
+                                <path
+                                    d="M29.18,44.74c.23-1.88-5.33-9-6.35-12.47-2.18-3.46-2.95-9-.57-12.62.94-1.45.53-2.71.53-4.72,0-19.9,34.88-19.91,34.88,0,0,2.52-.57,3.11.79,5.1,2.28,3.3,1.11,9.18-.82,12.25C56.4,35.89,50.57,42.7,51,44.75c.37,10.21-21.85,9.87-21.79,0ZM41.9,62.41h1.22a2,2,0,0,0,2-2V57.15a2,2,0,0,0-2-2H35.86a2,2,0,0,0-2,2V60.4a2,2,0,0,0,2,2H37.1L34.72,74.52h9.47L41.9,62.41ZM0,74.52C.94,62.3-1.45,62.83,8.77,59A78.79,78.79,0,0,0,23.1,51.74l8.78,22.78ZM56.26,50.7A58,58,0,0,0,69.5,57.32C79.05,60.5,79,60.94,79,74.52H47.2L56.26,50.7ZM91.49,64.78h1a1.62,1.62,0,0,0,1.62-1.61V60.56a1.63,1.63,0,0,0-1.62-1.62H86.63A1.62,1.62,0,0,0,85,60.56v2.61a1.62,1.62,0,0,0,1.61,1.61h1l-1.91,9.74h7.61l-1.84-9.74ZM81.27,50.58c.18-1.51-4.29-7.26-5.11-10-1.75-2.78-2.37-7.21-.46-10.14.76-1.17.43-2.18.43-3.8,0-16,28-16,28,0,0,2-.46,2.5.63,4.1,1.83,2.66.89,7.38-.66,9.85-1,2.9-5.68,8.37-5.36,10,.3,8.21-17.56,7.94-17.51,0ZM103,55.38a59,59,0,0,0,12.24,5.31c7.68,2.56,7.65,2.91,7.6,13.83H95.75L103,55.38Z" />
+                            </svg>
+
+                            <span class="ml-3">About Us</span>
+                        </a>
+                    </li>
+                    <!-- contact us -->
+                    <li>
+                        <a href="/contact_us" {% if current_page=='contact_us' %}
+                            class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 bg-gray-100 dark:bg-gray-700 dark:text-white group"
+                            {% else %}
+                            class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
+                            {% endif %}>
+
+                            <svg class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                                fill="currentColor" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 121.85 122.88">
+                                <path
+                                    d="M42.18,72.75A47.21,47.21,0,0,1,38.28,65c-8.39-4.72-9.73-25.71-4.56-24.12,0-.79-.14-3-.14-4.52,0-34.07,54.74-34.09,54.74,0,0,1.56-.16,3.73-.14,4.52C93.34,39.26,92,60.25,83.62,65c-2.13,5.9-5.93,9.86-5.62,12.45,0,8.89-9.77,12.11-17,12.19-.66,0-1.33,0-2-.1a17.8,17.8,0,0,0,4.52-1.9h0c3.11-1.9,5.21-4.71,5.21-8.08s-2.09-6.2-5.2-8.09h0a18.68,18.68,0,0,0-9.4-2.57,19.54,19.54,0,0,0-7.51,1.35,12.78,12.78,0,0,0-4,2.58l-.37,0Zm58.25-41.14h-.37C96.63,17.08,87.81,7,77.3,2.83A44.05,44.05,0,0,0,58,.15a46.75,46.75,0,0,0-18.44,5.4A34.24,34.24,0,0,0,22.15,31.61h-.69c-3.3,0-6.64,2.71-6.64,6V59.28c0,3.3,3.34,6,6.64,6h1.95C25.54,73.93,34.17,81.85,43,81.85h1.73c1.51,2.22,4.44,3.79,9.32,3.79s10.08-2.75,10.08-6.13S59,73.39,54.05,73.39,46.1,75,44.64,77.32H43c-7.54,0-15-8-15.53-15.22V32A29.1,29.1,0,0,1,42.13,10.2,41.46,41.46,0,0,1,58.4,5.47,38.8,38.8,0,0,1,75.33,7.79c8.71,3.44,16.06,12,19.23,23.82h-.13V65.28h6c3.3,0,6.64-2.7,6.64-6V37.62c0-3.31-3.34-6-6.64-6ZM64.59,104.44h1.86a3,3,0,0,0,3-3v-5a3,3,0,0,0-3-3h-11a3.05,3.05,0,0,0-3,3v5a3.06,3.06,0,0,0,3,3H57.3l-3.64,18.43H68.07l-3.48-18.44ZM0,122.88c1.43-18.54-2.21-17.79,13.32-23.6a128.67,128.67,0,0,0,22.78-11l13.27,34.63ZM86.4,86.67a95.25,95.25,0,0,0,21.07,10c14.5,4.82,14.5,5.5,14.36,26.17H72.65L86.4,86.67Z">
+                                </path>
+                            </svg>
+
+                            <span class="ml-3">Contact Us</span>
+                        </a>
+                    </li>
+                </ul>
+                <!-- Sidebar Menu List 2 -->
+                <ul class="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
+                    <!-- Signup -->
+                    <li>
+                        <a href="/signup"
+                            class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group">
+
+                            <svg class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                                fill="currentColor" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 115.34 122.88">
+                                <title>enrollment</title>
+                                <path
+                                    d="M57.34,116.35a3.27,3.27,0,0,1,0,6.53H7.6a7.61,7.61,0,0,1-7.6-7.6V7.6A7.61,7.61,0,0,1,7.6,0H98.36A7.61,7.61,0,0,1,106,7.6v54a10.65,10.65,0,0,1-.09,1.43h-.66l0,0h-.42l-.09,0,0,0h0l-.09,0-.08,0,0,0h0l-.08,0h0l-.09,0,0,0h0l-.08,0h0l-.09,0,0,0h0l-.08,0h0l-.08,0h-.08l-.09,0h0l-.08,0,0,0h0l-.08,0h0l-.08,0h-.09l-.08,0h0l-.08,0h0l0,0-.08,0h0l-.08,0h-.34l-.07,0h0l-.08,0h-.08l-.08,0H99.43V7.6a1.09,1.09,0,0,0-1.07-1.07H7.6a1.11,1.11,0,0,0-.76.31,1.13,1.13,0,0,0-.31.76V115.27a1,1,0,0,0,.32.75,1.12,1.12,0,0,0,.76.32Zm35.05.13L76,122.08l.13-18.25,16.29,12.65ZM80.73,97.72l17.68-24a1.6,1.6,0,0,1,1.91-.56L114.8,84a1.38,1.38,0,0,1,.15,2.06L97,110.38,80.73,97.72ZM29.13,62.84a6.51,6.51,0,0,1-.2-3.36c.46-3.55,1.38-4.21,4.66-5.12,3.68-1,7.84-1.09,11-3.27a10.9,10.9,0,0,0,.74-1.43c.37-.85.71-1.77.92-2.4a30.53,30.53,0,0,1-2.42-3.45l-2.45-3.9A7.17,7.17,0,0,1,40,36.35a2.85,2.85,0,0,1,.25-1.28,2.31,2.31,0,0,1,.84-1,1.93,1.93,0,0,1,.59-.3,62.62,62.62,0,0,1-.12-7,9.88,9.88,0,0,1,.3-1.59A9.43,9.43,0,0,1,46,19.93a13,13,0,0,1,3.47-1.54c.78-.22-.67-2.71.14-2.79,3.89-.4,10.18,3.15,12.9,6.09a9.47,9.47,0,0,1,2.39,6l-.15,6.36h0A1.74,1.74,0,0,1,66,35.38a5.44,5.44,0,0,1-.67,3.34h0l0,.09-2.8,4.59a23.76,23.76,0,0,1-3.42,4.72l.38.54A16.81,16.81,0,0,0,61.27,51a.16.16,0,0,1,.06.08c2.36,1.66,7.2,2.4,10.79,3.34,3,.79,4.1,1,4.77,4.28.34,1.62.35,3.4-.09,4.13ZM26.67,97.89a3.31,3.31,0,0,1,0-6.61H71l0,0,0,0h0l0,0v0l0,0,0,0h0l-.06.09h0v0l0,0v0l0,0h0l0,.05h0l0,0v0l0,0v0l0,0h0l0,0h0l0,0v0l0,0h0l0,0h0l0,0h0l0,0v0l0,0v0l0,0h0l0,.05h0l0,0v0l0,0h0l0,0h0l0,0h0l0,0v0l0,0h0l0,0h0l0,0v0l0,0V93h0l0,0h0l0,0v.13h0l0,0h0l0,0h0v0l0,0v0l0,0h0l0,0h0l0,0v.08h0l0,0h0l0,0h0V94h0l0,0h0v.12h0v0l-.07,0-.06,0h0l-.06,0-.06,0h0l0,0-.06,0,0,0,0,0-.06,0,0,0h0l-.06,0,0,0h0l-.07.05-.06,0h0l-.06,0-.06.06h0l-.05,0-.06,0,0,0,0,0-.06.05,0,0,0,0-.06,0,0,0h0l-.06.06-.05,0h0l-.06.06,0,0h0l0,0-.06.06h0l0,0-.06.06,0,0,0,0,0,.06,0,0,0,0,0,.06,0,.05h0l0,.06,0,0h0l-.06.06,0,.06h0l-.05,0,0,.06v0l0,0,0,.06,0,0,0,0-.05.06,0,0,0,0,0,.06,0,0h0l0,.07,0,.06h0l0,.07,0,.06h0l-.05.06,0,.06v0l0,0,0,.07,0,0,0,0,0,.07,0,0,0,0,0,.07,0,0h0l0,.07,0,.07h0l0,.07Zm1.27-18.16a3.27,3.27,0,1,1,0-6.53H75.78a3.27,3.27,0,1,1,0,6.53Z">
+                                </path>
+                            </svg>
+                            <span class="ml-3">Signup</span>
+                        </a>
+                    </li>
+                    <!-- Login -->
+                    <li>
+                        <a href="/login"
+                            class="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group">
+                            <svg class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                                fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+                                shape-rendering="geometricPrecision" text-rendering="geometricPrecision"
+                                image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd"
+                                viewBox="0 0 379 511.54">
+                                <path fill-rule="nonzero"
+                                    d="M107.83 0h194.21c21.17 0 40.41 8.68 54.34 22.61C370.33 36.56 379 55.82 379 76.96v357.62c0 21.06-8.69 40.29-22.63 54.26l-.1.1c-13.97 13.93-33.19 22.6-54.23 22.6H107.83c-21.15 0-40.41-8.67-54.36-22.62-13.93-13.93-22.61-33.17-22.61-54.34V360.6h37.55v73.98c0 10.81 4.45 20.67 11.59 27.81 7.15 7.15 17.02 11.6 27.83 11.6h194.21c10.83 0 20.7-4.43 27.8-11.54 7.18-7.17 11.61-17.04 11.61-27.87V76.96c0-10.8-4.45-20.67-11.6-27.82-7.13-7.14-17-11.59-27.81-11.59H107.83c-10.84 0-20.7 4.44-27.84 11.58-7.14 7.13-11.58 17-11.58 27.83v73.96H30.86V76.96c0-21.17 8.66-40.42 22.6-54.36C67.4 8.66 86.65 0 107.83 0zm59.06 161.72 97.02 91.6-101.77 96.42-25.8-27.12 50.94-48.28L0 274.66v-37.39l192.03-.33-50.8-47.96 25.66-27.26z">
+                                </path>
+                            </svg>
+                            <span class="ml-3">Login</span>
+                        </a>
+                    </li>
+                </ul>
+                {% endif %}
             </div>
 
             <!-- Social Icon -->
             <div
                 class=" absolute bottom-0 left-0 justify-center p-4 space-x-4 w-full lg:flex bg-white dark:bg-gray-800 z-20">
-                <a href="https://www.instagram.com/ratan_the_coder" target="_blank"
+                <a href="https://www.instagram.com/ak9234361170" target="_blank"
                     class="inline-flex justify-center p-2 text-gray-500 rounded cursor-pointer dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600">
                     <svg class="w-6 h-6" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
                         shape-rendering="geometricPrecision" text-rendering="geometricPrecision"
@@ -350,7 +489,7 @@
                             d="M170.663 256.157c-.083-47.121 38.055-85.4 85.167-85.482 47.121-.092 85.407 38.029 85.499 85.159.091 47.13-38.047 85.4-85.176 85.492-47.112.09-85.399-38.039-85.49-85.169zm-46.108.092c.141 72.602 59.106 131.327 131.69 131.185 72.592-.14 131.35-59.089 131.209-131.691-.141-72.577-59.114-131.336-131.715-131.194-72.585.141-131.325 59.114-131.184 131.7zm237.104-137.092c.033 16.954 13.817 30.682 30.772 30.649 16.961-.034 30.689-13.811 30.664-30.765-.033-16.954-13.818-30.69-30.78-30.656-16.962.033-30.689 13.818-30.656 30.772zm-208.696 345.4c-24.958-1.086-38.511-5.234-47.543-8.709-11.961-4.628-20.496-10.177-29.479-19.093-8.966-8.951-14.532-17.461-19.202-29.397-3.508-9.033-7.73-22.569-8.9-47.527-1.269-26.983-1.559-35.078-1.683-103.433-.133-68.338.116-76.434 1.294-103.441 1.069-24.941 5.242-38.512 8.709-47.536 4.628-11.977 10.161-20.496 19.094-29.478 8.949-8.983 17.459-14.532 29.403-19.202 9.025-3.526 22.561-7.715 47.511-8.9 26.998-1.278 35.085-1.551 103.423-1.684 68.353-.133 76.448.108 103.456 1.294 24.94 1.086 38.51 5.217 47.527 8.709 11.968 4.628 20.503 10.145 29.478 19.094 8.974 8.95 14.54 17.443 19.21 29.413 3.524 8.999 7.714 22.552 8.892 47.494 1.285 26.998 1.576 35.094 1.7 103.432.132 68.355-.117 76.451-1.302 103.442-1.087 24.957-5.226 38.52-8.709 47.56-4.629 11.953-10.161 20.488-19.103 29.471-8.941 8.949-17.451 14.531-29.403 19.201-9.009 3.517-22.561 7.714-47.494 8.9-26.998 1.269-35.086 1.56-103.448 1.684-68.338.133-76.424-.124-103.431-1.294zM149.977 1.773c-27.239 1.286-45.843 5.648-62.101 12.019-16.829 6.561-31.095 15.353-45.286 29.603C28.381 57.653 19.655 71.944 13.144 88.79c-6.303 16.299-10.575 34.912-11.778 62.168C.172 178.264-.102 186.973.031 256.489c.133 69.508.439 78.234 1.741 105.548 1.302 27.231 5.649 45.827 12.019 62.092 6.569 16.83 15.353 31.089 29.611 45.289 14.25 14.2 28.55 22.918 45.404 29.438 16.282 6.294 34.902 10.583 62.15 11.777 27.305 1.203 36.022 1.468 105.521 1.336 69.532-.133 78.25-.44 105.555-1.734 27.239-1.302 45.826-5.664 62.1-12.019 16.829-6.585 31.095-15.353 45.288-29.611 14.191-14.251 22.917-28.55 29.428-45.404 6.304-16.282 10.592-34.904 11.777-62.134 1.195-27.323 1.478-36.049 1.344-105.557-.133-69.516-.447-78.225-1.741-105.522-1.294-27.256-5.657-45.844-12.019-62.118-6.577-16.829-15.352-31.08-29.602-45.288-14.25-14.192-28.55-22.935-45.404-29.429-16.29-6.304-34.903-10.6-62.15-11.778C333.747.164 325.03-.101 255.506.031c-69.507.133-78.224.431-105.529 1.742z" />
                     </svg>
                 </a>
-                <a href="https://wa.me/917479493985?text=Hello%20I%20am%20interested%20in%20your%20services"
+                <a href="https://wa.me/919931425159?text=Hiii"
                     target="_blank"
                     class="inline-flex justify-center p-2 text-gray-500 rounded cursor-pointer dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600">
                     <svg class="w-6 h-6" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
@@ -383,8 +522,6 @@
 
 
         <!-- Footer -->
-
-
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
     </div>
 </body>

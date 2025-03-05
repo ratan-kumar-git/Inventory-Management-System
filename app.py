@@ -129,7 +129,12 @@ with app.app_context():
 # Home Page
 @app.route('/')
 def index():
-    return render_template('home.html', title='Home')
+    if 'email' in session:
+        user = User.query.filter_by(email=session['email']).first()
+        return render_template('home.html', title='Home', current_page = 'home', user=user)
+    else:
+        return render_template('home.html', title='Home', current_page = 'home')
+
 
 # Register Page
 @app.route('/signup', methods=['GET', 'POST'])
@@ -615,8 +620,7 @@ def about_us():
         user = User.query.filter_by(email=session['email']).first()
         return render_template('about_us.html', title='About Us', current_page = 'about_us', user=user)
     else:
-        flash('You need to login first.', 'error')
-        return redirect('/login')
+        return render_template('about_us.html', title='About Us', current_page = 'about_us')
     
 
 #Contact_us
@@ -626,8 +630,7 @@ def contact_us():
         user = User.query.filter_by(email=session['email']).first()
         return render_template('contact_us.html', title='Contact Us', current_page = 'contact_us', user=user)
     else:
-        flash('You need to login first.', 'error')
-        return redirect('/login')
+        return render_template('contact_us.html', title='Contact Us', current_page = 'contact_us')
     
 
 #Logout Page

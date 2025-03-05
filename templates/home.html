@@ -1,17 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <link rel="stylesheet" href="{{url_for('static', filename='css/output.css')}}">
-</head>
-<body class="bg-slate-800">
-    <div class="flex  justify-center items-center h-screen">
-        <a class="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded-lg m-2" href="/login">Login</a>
-        <a class="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded-lg m-2" href="/signup">Signup</a>
-        <a class="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded-lg m-2" href="/dashboard">Dashboard</a>
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<main class="p-4 md:ml-64 h-auto pt-20">
+    <h1 class="text-white flex justify-center m-4 text-2xl">Billing</h1>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <div class="border-2 border-dashed border-gray-300 rounded-lg dark:border-gray-600 h-32 md:h-64"></div>
+        <div class="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-32 md:h-64"></div>
+        <div class="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-32 md:h-64"></div>
+        <div class="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-32 md:h-64"></div>
     </div>
-    
-</body>
-</html>
+    <div class="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-96 mb-4"></div>
+    <div class="grid grid-cols-2 gap-4 mb-4">
+        <div class="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-48 md:h-72"></div>
+        <div class="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-48 md:h-72"></div>
+        <div class="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-48 md:h-72"></div>
+        <div class="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-48 md:h-72"></div>
+    </div>
+    <div class="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-96 mb-4"></div>
+    <div class="grid grid-cols-2 gap-4">
+        <div class="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-48 md:h-72"></div>
+        <div class="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-48 md:h-72"></div>
+        <div class="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-48 md:h-72"></div>
+        <div class="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-48 md:h-72"></div>
+    </div>
+</main>
+
+{% endblock %}
