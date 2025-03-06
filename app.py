@@ -102,36 +102,36 @@ class BillingDetails(db.Model):
     billing = db.relationship('Billing', backref=db.backref('details', lazy=True, cascade="all"))
     product = db.relationship('Products', backref=db.backref('billing_details', lazy=True, cascade="all"))
 
+    def __init__(self, billing_id, product_id, quantity, total_price):
+        self.billing_id = billing_id
+        self.product_id = product_id
+        self.quantity = quantity
+        self.total_price = total_price
+
+# Contact Us Table
+class Contact_us(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), nullable=False)
+    subject = db.Column(db.String(100), nullable=False)
+    message = db.Column(db.String(100), nullable=False)
+
+    def __init__(self, email, subject, message):
+        self.email = email
+        self.subject = subject
+        self.message = message
+
+
 with app.app_context():
     db.create_all()
 
-
-# @app.route('/search', methods=['GET'])
-# def search():
-#     if 'email' in session:
-#         user = User.query.filter_by(email=session['email']).first()
-#         query = request.args.get('q', '')
-
-#         if query:
-#             results = Products.query.filter(
-#                 Products.user_id == user.id,
-#                 Products.prod_name.ilike(f"%{query}%")
-#             ).limit(5).all()
-
-#             suggestions = [product.prod_name for product in results]
-#             return jsonify(suggestions)
-
-#         return jsonify([])
-#     else:
-#         flash('You need to login first.', 'error')
-#         return redirect('/login')
 
 # Home Page
 @app.route('/')
 def index():
     if 'email' in session:
         user = User.query.filter_by(email=session['email']).first()
-        return render_template('home.html', title='Home', current_page = 'home', user=user)
+        messages = Contact_us.query.order_by(Contact_us.id.desc()).all()
+        return render_template('home.html', title='Home', current_page = 'home', user=user, messages=messages)
     else:
         return render_template('home.html', title='Home', current_page = 'home')
 
@@ -185,7 +185,8 @@ def login():
 def dashboard():
     if 'email' in session:
         user = User.query.filter_by(email=session['email']).first()
-        return render_template('dashboard.html', title='Dashboard', current_page = 'dashboard', user=user)
+        messages = Contact_us.query.order_by(Contact_us.id.desc()).all()
+        return render_template('dashboard.html', title='Dashboard', current_page = 'dashboard', user=user, messages=messages)
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
@@ -195,6 +196,7 @@ def dashboard():
 def customers():
     if 'email' in session:
         user = User.query.filter_by(email=session['email']).first()
+        messages = Contact_us.query.order_by(Contact_us.id.desc()).all()
     
         # Get page number from request arguments, default to 1
         page = request.args.get('page', 1, type=int)
@@ -206,7 +208,7 @@ def customers():
         for customer in customers:
             billings = Billing.query.filter_by(customer_id=customer.id).all()
 
-        return render_template('customer.html', title='Customer', current_page='customer', user=user, customers=customers, total_customer=total_customer, min=min, enumerate=enumerate, billings=billings)
+        return render_template('customer.html', title='Customer', current_page='customer', user=user, customers=customers, total_customer=total_customer, min=min, enumerate=enumerate, billings=billings, messages=messages)
 
     else:
         flash('You need to login first.', 'error')
@@ -217,6 +219,7 @@ def customers():
 def add_customer():
     if 'email' in session:
         user = User.query.filter_by(email=session['email']).first()
+        messages = Contact_us.query.order_by(Contact_us.id.desc()).all()
         if request.method == 'POST':
             customer_name = request.form['customer_name']
             customer_village = request.form['customer_vill_name']
@@ -227,7 +230,7 @@ def add_customer():
             db.session.commit()
             flash('Customer Added Successful.', 'success')
 
-        return render_template('add_customer.html', title='Add Customer', current_page = 'add_customer', user=user)
+        return render_template('add_customer.html', title='Add Customer', current_page = 'add_customer', user=user, messages=messages)
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
@@ -264,11 +267,12 @@ def download_customer():
 def customer_detail(id):
     if 'email' in session:
         user = User.query.filter_by(email=session['email']).first()
+        messages = Contact_us.query.order_by(Contact_us.id.desc()).all()
         customer = Customer.query.filter_by(id=id, user_id=user.id).first()
         billings = Billing.query.filter_by(customer_id=customer.id).all()
         total_dues = sum(billing.dues for billing in billings)
 
-        return render_template('customer_detail.html', title='Customer Detail', current_page='customer', user=user, customer=customer, billings=billings, total_dues=total_dues)
+        return render_template('customer_detail.html', title='Customer Detail', current_page='customer', user=user, customer=customer, billings=billings, total_dues=total_dues, messages=messages)
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
@@ -279,6 +283,7 @@ def customer_billing_detail(custo_id, bill_id):
     if 'email' in session:
         user = User.query.filter_by(email=session['email']).first()
         customer = Customer.query.filter_by(id=custo_id, user_id=user.id).first()
+        messages = Contact_us.query.order_by(Contact_us.id.desc()).all()
 
         # Join BillingDetails with Billing and Products to fetch required details in one query
         customer_billing_details = (
@@ -296,7 +301,8 @@ def customer_billing_detail(custo_id, bill_id):
             current_page='customer',
             user=user,
             customer=customer,
-            customer_billing_details=customer_billing_details
+            customer_billing_details=customer_billing_details,
+            messages=messages
         )
     else:
         flash('You need to login first.', 'error')
@@ -335,7 +341,7 @@ def delete_customer(id):
 def products():
     if 'email' in session:
         user = User.query.filter_by(email=session['email']).first()
-        # products = Products.query.filter(Products.user_id == user.id).all()
+        messages = Contact_us.query.order_by(Contact_us.id.desc()).all()
 
         # Get page number from request arguments, default to 1
         page = request.args.get('page', 1, type=int)
@@ -345,7 +351,7 @@ def products():
         total_product = Products.query.filter(Products.user_id == user.id).count()
 
         return render_template('product.html', title='Products', current_page='products', 
-                               user=user, products=products, total_product=total_product, min=min, enumerate=enumerate)
+                               user=user, products=products, total_product=total_product, min=min, enumerate=enumerate, messages=messages)
 
     else:
         flash('You need to login first.', 'error')
@@ -356,6 +362,7 @@ def products():
 def add_products():
     if 'email' in session:
         user = User.query.filter_by(email=session['email']).first()
+        messages = Contact_us.query.order_by(Contact_us.id.desc()).all()
 
         if request.method == 'POST':
             prod_name = request.form['product_name']
@@ -369,7 +376,7 @@ def add_products():
             db.session.add(new_data)
             db.session.commit()
             flash('Product Added Successful.', 'success')
-        return render_template('add_product.html', title='Add Products', current_page = 'add_product', user=user)
+        return render_template('add_product.html', title='Add Products', current_page = 'add_product', user=user, messages=messages)
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
@@ -409,12 +416,13 @@ def edit_product(prod_id):
     if 'email' in session:
         user = User.query.filter_by(email=session['email']).first()
         product = Products.query.filter_by(prod_id=prod_id, user_id=user.id).first()
+        messages = Contact_us.query.order_by(Contact_us.id.desc()).all()
 
         if not product :
             flash('Data not found or you do not have permission to edit this data.', 'error')
             return redirect('/products')
         
-        return render_template('edit_product.html', title='Edit Product', user=user, product=product)
+        return render_template('edit_product.html', title='Edit Product', user=user, product=product, messages=messages)
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
@@ -480,7 +488,8 @@ def billing():
         user = User.query.filter_by(email=session['email']).first()
         customers = Customer.query.filter_by(user_id=user.id).all()
         products = Products.query.filter_by(user_id=user.id).all()
-        return render_template('billing.html', title='Billing', current_page = 'billing', user=user, customers=customers, products=products)
+        messages = Contact_us.query.order_by(Contact_us.id.desc()).all()
+        return render_template('billing.html', title='Billing', current_page = 'billing', user=user, customers=customers, products=products, messages=messages)
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
@@ -599,6 +608,7 @@ def get_customer_details(customer_id):
 def billing_history():
     if 'email' in session:
         user = User.query.filter_by(email=session['email']).first()
+        messages = Contact_us.query.order_by(Contact_us.id.desc()).all()
         customer_billing = (
             db.session.query(Customer, Billing)
             .join(Billing, Billing.customer_id == Customer.id)
@@ -607,7 +617,7 @@ def billing_history():
             .all()
         )
 
-        return render_template('billing_history.html', title='Billing History', current_page = 'billing_history', user=user, customer_billing=customer_billing)
+        return render_template('billing_history.html', title='Billing History', current_page = 'billing_history', user=user, customer_billing=customer_billing, messages=messages)
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
@@ -618,20 +628,65 @@ def billing_history():
 def about_us():
     if 'email' in session:
         user = User.query.filter_by(email=session['email']).first()
-        return render_template('about_us.html', title='About Us', current_page = 'about_us', user=user)
+        messages = Contact_us.query.order_by(Contact_us.id.desc()).all()
+        return render_template('about_us.html', title='About Us', current_page = 'about_us', user=user, messages=messages)
     else:
         return render_template('about_us.html', title='About Us', current_page = 'about_us')
     
 
 #Contact_us
-@app.route('/contact_us', methods=['GET', 'POST'])
+@app.route('/contact_us', methods=['GET','POST'])
 def contact_us():
     if 'email' in session:
         user = User.query.filter_by(email=session['email']).first()
-        return render_template('contact_us.html', title='Contact Us', current_page = 'contact_us', user=user)
+        messages = Contact_us.query.order_by(Contact_us.id.desc()).all()
+        if request.method == 'POST':
+            email = request.form['email']
+            subject = request.form['subject']
+            message = request.form['message']
+
+            new_data = Contact_us(email=email, subject=subject, message=message)
+            db.session.add(new_data)
+            db.session.commit()    
+
+            flash('Message Send Successful.', 'success')
+        return render_template('contact_us.html', title='Contact Us', current_page = 'contact_us', user=user, messages=messages)
     else:
+        if request.method == 'POST':
+            email = request.form['email']
+            subject = request.form['subject']
+            message = request.form['message']
+
+            new_data = Contact_us(email=email, subject=subject, message=message)
+            db.session.add(new_data)
+            db.session.commit()    
+
+            flash('Message Send Successful.', 'success')
         return render_template('contact_us.html', title='Contact Us', current_page = 'contact_us')
-    
+
+
+#Deleting Contact Us Message
+@app.route('/delete_message/<int:id>', methods=['GET'])
+def delete_message(id):
+    if 'email' in session:
+        message = Contact_us.query.filter_by(id=id).first()
+        if not message :
+            flash('Message not found.', 'error')
+            return redirect('/contact_us')
+
+        try:
+            db.session.delete(message)
+            db.session.commit()
+            flash('Message deleted successfully.', 'success')
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            flash('An error occurred while deleting the message. Please try again.', 'error')
+            print(f"SQLAlchemyError: {e}")
+
+        return redirect('/contact_us')
+    else:
+        flash('You need to login first.', 'error')
+        return redirect('/login')
 
 #Logout Page
 @app.route('/logout')
