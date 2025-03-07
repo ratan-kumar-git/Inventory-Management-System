@@ -1,5 +1,7 @@
+from collections import defaultdict
 from flask import Flask, render_template, request, redirect, flash, session, send_file, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
 from io import BytesIO
@@ -54,7 +56,7 @@ class Customer(db.Model):
 
 # Product Table
 class Products(db.Model):
-    prod_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     prod_name = db.Column(db.String(100), nullable=False)
     prod_quantity = db.Column(db.Integer, nullable=False)
@@ -94,7 +96,7 @@ class Billing(db.Model):
 class BillingDetails(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     billing_id = db.Column(db.Integer, db.ForeignKey('billing.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('products.prod_id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     total_price = db.Column(db.Float, nullable=False)
 
@@ -186,10 +188,49 @@ def dashboard():
     if 'email' in session:
         user = User.query.filter_by(email=session['email']).first()
         messages = Contact_us.query.order_by(Contact_us.id.desc()).all()
-        return render_template('dashboard.html', title='Dashboard', current_page = 'dashboard', user=user, messages=messages)
+        customers = Customer.query.filter(Customer.user_id == user.id).order_by(Customer.id.desc()).all()
+
+        # Get products with low stock
+        low_prod_stock = Products.query.filter(Products.user_id == user.id, Products.prod_quantity<=Products.prod_min_quantity).order_by(Products.prod_quantity).all()
+        
+        # Get total customers, products, billings, and sales
+        total_customer = Customer.query.filter(Customer.user_id == user.id).count()
+        total_product = Products.query.filter(Products.user_id == user.id).count()
+        total_billings = Billing.query.count()
+        total_sales = db.session.query(func.sum(Billing.total_amount)).scalar() or 0
+
+        return render_template('dashboard.html', title='Dashboard', current_page = 'dashboard', 
+            user=user, messages=messages, customers=customers, low_prod_stock=low_prod_stock,
+            total_customer=total_customer, total_product=total_product, total_sales=total_sales, 
+            total_billings=total_billings
+            )
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
+
+# Get Sales Data for Chart   
+@app.route('/get_sales_data')
+def get_sales_data():
+    if 'email' in session:
+        # Fetch sales data
+        sales_data = Billing.query.with_entities(Billing.billing_date, Billing.total_amount).all()
+
+        # Aggregate sales per day
+        sales_summary = defaultdict(float)
+        for sale in sales_data:
+            date_str = sale.billing_date.strftime('%d-%m')  # Format date
+            sales_summary[date_str] += sale.total_amount
+
+        # Convert to JSON format
+        sales_json = {
+            "dates": list(sales_summary.keys()),
+            "amounts": list(sales_summary.values())
+        }
+
+        return jsonify(sales_json)  # Return JSON response
+    else:
+        return jsonify({"error": "Unauthorized"}), 403
+
 
 #Customer
 @app.route('/customers', methods=['GET', 'POST'])
@@ -289,12 +330,10 @@ def customer_billing_detail(custo_id, bill_id):
         customer_billing_details = (
             db.session.query(BillingDetails, Billing, Products)
             .join(Billing, BillingDetails.billing_id == Billing.id)
-            .join(Products, BillingDetails.product_id == Products.prod_id)
+            .join(Products, BillingDetails.product_id == Products.id)
             .filter(Billing.id == bill_id)
             .all()
         )
-        print(customer_billing_details)
-
         return render_template(
             'customer_bill_detail.html',
             title='Customer Detail',
@@ -347,7 +386,7 @@ def products():
         page = request.args.get('page', 1, type=int)
         
         # Paginate products (10 per page)
-        products = Products.query.filter(Products.user_id == user.id).order_by(Products.prod_id.desc()).paginate(page=page, per_page=10)
+        products = Products.query.filter(Products.user_id == user.id).order_by(Products.id.desc()).paginate(page=page, per_page=10)
         total_product = Products.query.filter(Products.user_id == user.id).count()
 
         return render_template('product.html', title='Products', current_page='products', 
@@ -411,11 +450,11 @@ def download_excel():
         return redirect('/login')
 
 # Edit product 
-@app.route('/edit_product/<int:prod_id>', methods=['GET'])
-def edit_product(prod_id):
+@app.route('/edit_product/<int:id>', methods=['GET'])
+def edit_product(id):
     if 'email' in session:
         user = User.query.filter_by(email=session['email']).first()
-        product = Products.query.filter_by(prod_id=prod_id, user_id=user.id).first()
+        product = Products.query.filter_by(id=id, user_id=user.id).first()
         messages = Contact_us.query.order_by(Contact_us.id.desc()).all()
 
         if not product :
@@ -428,11 +467,11 @@ def edit_product(prod_id):
         return redirect('/login')
 
 # Update Product
-@app.route('/update_data/<int:prod_id>', methods=['POST'])
-def update_data(prod_id):
+@app.route('/update_data/<int:id>', methods=['POST'])
+def update_data(id):
     if 'email' in session:
         user = User.query.filter_by(email=session['email']).first()
-        product = Products.query.filter_by(prod_id=prod_id, user_id=user.id).first()
+        product = Products.query.filter_by(id=id, user_id=user.id).first()
 
         if not product :
             flash('Data not found or you do not have permission to edit this data.', 'error')
@@ -454,15 +493,15 @@ def update_data(prod_id):
         return redirect('/login')
 
 # Delete product
-@app.route('/delete_product/<int:prod_id>', methods=['GET'])
-def delete_product(prod_id):
+@app.route('/delete_product/<int:id>', methods=['GET'])
+def delete_product(id):
     if 'email' in session:
         user = User.query.filter_by(email=session['email']).first()
         if not user:
             flash('User not found.', 'error')
             return redirect('/login')
 
-        product = Products.query.filter_by(prod_id=prod_id, user_id=user.id).first()
+        product = Products.query.filter_by(id=id, user_id=user.id).first()
         if not product :
             flash('Customer not found.', 'error')
             return redirect('/products')
@@ -550,7 +589,7 @@ def prod_billing():
         product_id = product_data['prodId']
         quantity = product_data['quantity']
 
-        product = Products.query.filter_by(user_id=user.id, prod_id=product_id).first()
+        product = Products.query.filter_by(user_id=user.id, id=product_id).first()
 
         if product and product.prod_quantity >= quantity:
             total_price = product.prod_sell_price * quantity
@@ -560,7 +599,7 @@ def prod_billing():
 
             bill_detail = BillingDetails(
                 billing_id=billing.id,
-                product_id=product.prod_id,
+                product_id=product.id,
                 quantity=quantity,
                 total_price=total_price
             )
