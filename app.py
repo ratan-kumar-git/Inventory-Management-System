@@ -246,10 +246,8 @@ def customers():
         customers = Customer.query.filter(Customer.user_id == user.id).order_by(Customer.id.desc()).paginate(page=page, per_page=10)
         total_customer = Customer.query.filter(Customer.user_id == user.id).count()
 
-        for customer in customers:
-            billings = Billing.query.filter_by(customer_id=customer.id).all()
 
-        return render_template('customer.html', title='Customer', current_page='customer', user=user, customers=customers, total_customer=total_customer, min=min, enumerate=enumerate, billings=billings, messages=messages)
+        return render_template('customer.html', title='Customer', current_page='customer', user=user, customers=customers, total_customer=total_customer, min=min, enumerate=enumerate, messages=messages)
 
     else:
         flash('You need to login first.', 'error')
