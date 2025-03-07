@@ -196,8 +196,20 @@ def dashboard():
         # Get total customers, products, billings, and sales
         total_customer = Customer.query.filter(Customer.user_id == user.id).count()
         total_product = Products.query.filter(Products.user_id == user.id).count()
-        total_billings = Billing.query.count()
-        total_sales = db.session.query(func.sum(Billing.total_amount)).scalar() or 0
+
+        total_billings = (
+        db.session.query(Billing)
+        .join(Customer, Customer.id == Billing.customer_id)
+        .filter(Customer.user_id == user.id)
+        .count()
+        )
+        
+        total_sales = (
+        db.session.query(func.sum(Billing.total_amount))
+        .join(Customer, Customer.id == Billing.customer_id)  # Correct join condition
+        .filter(Customer.user_id == user.id)  # Filters for the specific user
+        .scalar()
+        ) or 0
 
         return render_template('dashboard.html', title='Dashboard', current_page = 'dashboard', 
             user=user, messages=messages, customers=customers, low_prod_stock=low_prod_stock,
@@ -246,8 +258,16 @@ def customers():
         customers = Customer.query.filter(Customer.user_id == user.id).order_by(Customer.id.desc()).paginate(page=page, per_page=10)
         total_customer = Customer.query.filter(Customer.user_id == user.id).count()
 
+        # Get total dues separately
+        customer_dues = {
+            c.id: db.session.query(func.coalesce(func.sum(Billing.dues), 0))
+            .filter(Billing.customer_id == c.id)
+            .scalar()
+            for c in customers.items
+        }
 
-        return render_template('customer.html', title='Customer', current_page='customer', user=user, customers=customers, total_customer=total_customer, min=min, enumerate=enumerate, messages=messages)
+
+        return render_template('customer.html', title='Customer', current_page='customer', user=user, customers=customers, total_customer=total_customer, min=min, enumerate=enumerate, messages=messages, customer_dues=customer_dues)
 
     else:
         flash('You need to login first.', 'error')
