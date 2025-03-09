@@ -243,6 +243,23 @@ def get_sales_data():
     else:
         return jsonify({"error": "Unauthorized"}), 403
 
+# Get Data During Billing
+@app.route('/get_product_details/<int:id>', methods=['GET'])
+def get_product_details(id):
+    product = db.session.get(Products, id)
+    print(product)
+
+    if product:
+        return jsonify({
+            'prod_qty': product.prod_quantity,
+            'min_qty': product.prod_min_quantity,
+            'sell_price': product.prod_sell_price,
+            'mrp': product.prod_mrp,
+            'buy_price': product.prod_buy_price
+            })
+    
+    return jsonify({'error': 'Customer not found'}), 404
+
 
 #Customer
 @app.route('/customers', methods=['GET', 'POST'])
@@ -328,7 +345,7 @@ def customer_detail(id):
         user = User.query.filter_by(email=session['email']).first()
         messages = Contact_us.query.order_by(Contact_us.id.desc()).all()
         customer = Customer.query.filter_by(id=id, user_id=user.id).first()
-        billings = Billing.query.filter_by(customer_id=customer.id).all()
+        billings = Billing.query.filter_by(customer_id=customer.id).order_by(Billing.id.desc()).all()
         total_dues = sum(billing.dues for billing in billings)
 
         return render_template('customer_detail.html', title='Customer Detail', current_page='customer', user=user, customer=customer, billings=billings, total_dues=total_dues, messages=messages)
@@ -434,6 +451,33 @@ def add_products():
             db.session.commit()
             flash('Product Added Successful.', 'success')
         return render_template('add_product.html', title='Add Products', current_page = 'add_product', user=user, messages=messages)
+    else:
+        flash('You need to login first.', 'error')
+        return redirect('/login')
+
+#Add Stock
+@app.route('/add_stock', methods=['GET', 'POST'])
+def add_stock():
+    if 'email' in session:
+        user = User.query.filter_by(email=session['email']).first()
+
+        if request.method == 'POST':
+            product_id = request.form['product_id']
+
+            product = Products.query.filter_by(id=product_id, user_id=user.id).first()
+            if not product:
+                flash('Product not found.', 'error')
+                return redirect('/add_stock')
+            
+            stock_quantity = int(request.form['quantity'])
+            product.prod_quantity += stock_quantity
+            product.prod_buy_price  = request.form['buy_price']
+            product.prod_mrp = request.form['mrp']
+            product.prod_sell_price = request.form['sell_price']
+
+            db.session.commit()
+            flash('Stock Added Successful.', 'success')
+        return redirect('/dashboard')
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')

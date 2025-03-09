@@ -83,35 +83,26 @@
         </div>
 
         <!-- Box 2 -->
-        <div class="mt-5 grid grid-cols-1 lg:grid-cols-5 gap-4">
-            <!-- Sales -->
-            <div class="col-span-1 lg:col-span-3 rounded bg-rose-400 text-white">
-                <div class="p-2 bg-rose-500 text-white rounded-t-md">
-                    <h1 class="text-center text-lg font-bold">Sales Analysis</h1>
-                </div>
-                <div class="p-4">
-                    <canvas id="salesChart" ></canvas> <!-- Chart.js Canvas -->
-                </div>
-            </div>
-
+        <div class="mt-5 grid grid-cols-1 lg:grid-cols-4 gap-4">
             <!-- Low stocks -->
-            <div class="col-span-1 lg:col-span-2 rounded bg-indigo-500 text-white">
-                <div class="p-2 bg-indigo-600 text-white rounded-t-md">
+            <div class="col-span-1 lg:col-span-2 rounded bg-indigo-600 text-white">
+                <div class="p-2 bg-indigo-800 text-white rounded-t-md">
                     <h1 class="text-center text-lg font-bold">Low Stocks</h1>
                 </div>
                 <div class="h-96 overflow-y-auto">
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                         <thead
-                            class="text-sm text-white font-bold uppercase bg-indigo-600 border-y dark:border-gray-600">
+                            class="text-sm text-white font-bold uppercase bg-indigo-700 border-y dark:border-gray-600">
                             <tr>
                                 <th scope="col" class="px-4 py-3 whitespace-nowrap">SNo.</th>
                                 <th scope="col" class="px-4 py-3 whitespace-nowrap">Product Name</th>
                                 <th scope="col" class="px-4 py-3 whitespace-nowrap">Quantity</th>
+                                <th scope="col" class="px-4 py-3 whitespace-nowrap">Sell Price</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for product in low_prod_stock %}
-                            <tr class="border-b text-base dark:border-gray-600 hover:bg-indigo-600">
+                            <tr class="border-b text-base dark:border-gray-600 hover:bg-indigo-500">
                                 <td class="px-4 py-2 font-medium whitespace-nowra text-white">
                                     <div class="flex items-center">
                                         {{loop.index}}
@@ -127,10 +118,116 @@
                                         {{product.prod_quantity}}
                                     </div>
                                 </td>
+                                <td class="px-4 py-2 font-medium whitespace-nowra text-white">
+                                    <div class="flex items-center">
+                                        {{product.prod_sell_price}}
+                                    </div>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- Add Stocks -->
+            <div class="col-span-1 lg:col-span-2 rounded bg-rose-400 text-white">
+                <!-- Header -->
+                <div class="p-2 bg-rose-500 text-white rounded-t-md">
+                    <h1 class="text-center text-lg font-bold">Add Stock</h1>
+                </div>
+                <form action="/add_stock" method="post">
+                    <!-- Product Area -->
+                    <div class="grid sm:grid-cols-2 p-5 border-b dark:border-gray-600">
+                        <!-- Left Box/Div -->
+                        <div class="text-lg font-medium text-white">
+                            <label for="Product Name" class="">Product Name :</label>
+                            <select id="product_select" name="product_id" required
+                                class="p-1 w-2/4 bg-rose-500 text-white text-sm border border-gray-30 rounded-lg">
+                                <option value="">Select Product</option>
+                                {% for product in low_prod_stock %}
+                                <option value="{{ product.id }}">{{ product.prod_name }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="Quantity" class="block">
+                                Quantity : <span id="quantity"></span>
+                            </label>
+                            <label for="Min Qty" class="block">
+                                Min Qty : <span id="min_qty"></span>
+                            </label>
+                        </div>
+
+                        <!-- Right Box/Div -->
+                        <div class="text-lg md:text-right font-medium text-white">
+                            <label for="date" class="block">
+                                Sell price : <span id="sell_price"></span>
+                            </label>
+                            <label for="time" class="block">
+                                MRP : <span id="mrp"></span>
+                            </label>
+                            <label for="customer_phone" class="block">
+                                Buy Price : <span id="buy_price"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <!-- Add New Stock -->
+                    <div class="p-5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+                            <div class="text-lg font-medium text-white">
+                                <label for="Quantity">Quantity :</label>
+                                <input type="number" name="quantity" required
+                                    class="p-1 w-2/4 m-1 bg-rose-500 text-white text-sm border border-gray-30 rounded-lg">
+                            </div>
+                            <div class="text-lg md:text-right font-medium text-white">
+                                <label for="buy_price">Buy Price :</label>
+                                <input type="number" name="buy_price" id="buy_price" required
+                                    class="p-1 w-2/4 bg-rose-500 text-white text-sm border border-gray-30 rounded-lg">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="text-lg font-medium text-white">
+                                <label for="MRP">MRP :</label>
+                                <input type="mrp" name="mrp" id="mrp" required
+                                    class="p-1 ml-9 w-2/4 bg-rose-500 text-white text-sm border border-gray-30 rounded-lg">
+                            </div>
+                            <div class="text-lg md:text-right font-medium text-white">
+                                <label for="sell_price">Sell Price :</label>
+                                <input type="number" name="sell_price" id="sell_price" required
+                                    class="p-1 w-2/4 bg-rose-500 text-white text-sm border border-gray-30 rounded-lg">
+                            </div>
+                        </div>
+                        <div class="w-full text-center mt-5">
+                            <button type="submit"
+                                class="w-full p-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg">Add
+                                Stock
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <!-- Notification -->
+                <div id="alert-1"
+                    class="flex items-center p-2 mx-5 mb-5 text-blue-800 rounded-lg bg-blue-50"
+                    role="alert">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="{{ category }}" class="ms-3 text-sm font-medium">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+                    <button type="button"
+                        class="ms-auto -mx-1.5 -my-1.5 bg-blue-50 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 inline-flex items-center justify-center h-8 w-8 "
+                        data-dismiss-target="#alert-1" aria-label="Close">
+                        <span class="sr-only">Close</span>
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -140,7 +237,8 @@
 <!-- Include Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    // Selles Chart
+    document.addEventListener("DOMContentLoaded", function () {
         fetch('/get_sales_data')  // Fetch sales data from Flask API
             .then(response => response.json())
             .then(data => {
@@ -161,7 +259,7 @@
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: true, 
+                        maintainAspectRatio: true,
                         plugins: {
                             legend: {
                                 labels: {
@@ -183,6 +281,51 @@
                 });
             })
             .catch(error => console.error('Error fetching sales data:', error));
+    });
+
+    // Fetch data For Add Stock
+    document.addEventListener('DOMContentLoaded', function () {
+        const productSelect = document.getElementById('product_select');
+        const Qty = document.getElementById('quantity');
+        const minQty = document.getElementById('min_qty');
+        const sellField = document.getElementById('sell_price');
+        const mrpField = document.getElementById('mrp');
+        const buyField = document.getElementById('buy_price');
+
+        productSelect.addEventListener('change', function () {
+            let productId = this.value;
+
+            if (productId) {
+                fetch(`/get_product_details/${productId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.error) {
+                            console.error('Error:', data.error);
+                            return;
+                        }
+
+                        // Update span elements with fetched data
+                        Qty.textContent = data.prod_qty || '0';
+                        minQty.textContent = data.min_qty || 'N/A';
+                        sellField.textContent = data.sell_price || 'N/A';
+                        mrpField.textContent = data.mrp || 'N/A';
+                        buyField.textContent = data.buy_price || 'N/A';
+                    })
+                    .catch(error => console.error('Error fetching product details:', error));
+            } else {
+                // Clear fields if no customer is selected
+                Qty.textContent = '';
+                minQty.textContent = '';
+                sellField.textContent = '';
+                mrpField.textContent = '';
+                buyField.textContent = '';
+            }
+        });
     });
 </script>
 

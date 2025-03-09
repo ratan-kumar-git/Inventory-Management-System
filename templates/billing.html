@@ -88,57 +88,49 @@
                     </div>
 
                     <!-- Modal body -->
-                    <div class="text-lg font-medium text-gray-900 dark:text-white overflow-auto h-[80vh] md:h-96">
-                        <table id="product_table"
-                            class="w-full  border-collapse border border-gray-300 dark:border-gray-600">
-                            <thead class="bg-gray-200 dark:bg-gray-900">
+                    <div class="overflow-auto h-[80vh] md:h-96 rounded-md">
+                        <table id="product_table "
+                            class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                            <thead class="text-md uppercase text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
-                                    <th class="whitespace-nowrap border border-gray-300 dark:border-gray-600 p-2">
-                                        SNo</th>
-                                    <th class="whitespace-nowrap border border-gray-300 dark:border-gray-600 p-2">
-                                        Product Name
-                                    </th>
-                                    <th class="whitespace-nowrap border border-gray-300 dark:border-gray-600 p-2">
-                                        MRP</th>
-                                    <th class="whitespace-nowrap border border-gray-300 dark:border-gray-600 p-2">
-                                        Sell Price</th>
-                                    <th class="whitespace-nowrap border border-gray-300 dark:border-gray-600 p-2">
-                                        Buy Price</th>
-                                    <th class="whitespace-nowrap border border-gray-300 dark:border-gray-600 p-2">
-                                        Quantity</th>
-                                    <th class="whitespace-nowrap border border-gray-300 dark:border-gray-600 p-2">
-                                        Add</th>
+                                    <th class="px-4 py-3 whitespace-nowrap">SNo</th>
+                                    <th class="px-4 py-3 whitespace-nowrap">Add</th>
+                                    <th class="px-4 py-3 whitespace-nowrap">Product Name</th>
+                                    <th class="px-4 py-3 whitespace-nowrap">Quantity</th>
+                                    <th class="px-4 py-3 whitespace-nowrap">Sell Price</th>
+                                    <th class="px-4 py-3 whitespace-nowrap">MRP</th>
+                                    <th class="px-4 py-3 whitespace-nowrap">Buy Price</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for product in products %}
-                                <tr>
-                                    <td class="border border-gray-300 dark:border-gray-600 p-2">
+                                <tr class="border-b text-base dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                         {{loop.index }}
                                     </td>
-                                    <td class="border border-gray-300 dark:border-gray-600 p-2">
-                                        {{product.prod_name }}
-                                    </td>
-                                    <td class="border border-gray-300 dark:border-gray-600 p-2">
-                                        {{product.prod_mrp }}
-                                    </td>
-                                    <td class="border border-gray-300 dark:border-gray-600 p-2">
-                                        {{product.prod_sell_price }}
-                                    </td>
-                                    <td class="border border-gray-300 dark:border-gray-600 p-2">
-                                        {{product.prod_buy_price }}
-                                    </td>
-                                    <td class="border border-gray-300 dark:border-gray-600 p-2">
-                                        {{product.prod_quantity }}
-                                    </td>
-                                    <td class="border border-gray-300 dark:border-gray-600 p-2">
-                                        <button class="add-to-bill text-blue-500 hover:text-blue-700"
+                                    <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        <button class="add-to-bill rounded-lg p-1 hover:bg-gray-300 dark:hover:bg-gray-800"
                                             data-prod-id="{{ product.id }}"
                                             data-prod-name="{{ product.prod_name }}"
                                             data-prod-mrp="{{ product.prod_mrp }}"
                                             data-prod-sell="{{ product.prod_sell_price }}">
                                             ➕
                                         </button>
+                                    </td>
+                                    <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        {{product.prod_name }}
+                                    </td>
+                                    <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        {{product.prod_quantity }}
+                                    </td>
+                                    <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        {{product.prod_sell_price }}
+                                    </td>
+                                    <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        {{product.prod_mrp }}
+                                    </td>
+                                    <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        {{product.prod_buy_price }}
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -277,6 +269,8 @@
 
                 const newRow = document.createElement('tr');
                 newRow.setAttribute('data-prod-id', prodId);
+                newRow.classList.add('border-b', 'text-base', 'dark:border-gray-600', 'hover:bg-gray-100', 'dark:hover:bg-gray-700');
+
                 newRow.innerHTML = `
                 <td class="border-b px-4 py-3 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     ${serialNumber++}
@@ -299,7 +293,7 @@
                     ${prodSell.toFixed(2)}
                 </td>
                 <td class="border-b px-4 py-3 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <button type="button" class="remove-product">❌</button>
+                    <button type="button" class="remove-product rounded-lg p-1 hover:bg-gray-300 dark:hover:bg-gray-800">❌</button>
                 </td>
             `;
                 billingTableBody.appendChild(newRow);
@@ -389,7 +383,7 @@
 
                     if (result.status === 200) {
                         alert(result.body.message); // Success message
-                        setTimeout(() => location.reload(), 1000); // Refresh after 1 second
+                        setTimeout(() => location.reload(), 150); // Refresh after 1 second
                     } else {
                         alert("Error: " + result.body.message); // Error message
                     }
