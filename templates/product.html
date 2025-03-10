@@ -51,9 +51,9 @@
                             <th scope="col" class="px-4 py-3 whitespace-nowrap">SN</th>
                             <th scope="col" class="px-4 py-3 whitespace-nowrap">Product Name</th>
                             <th scope="col" class="px-4 py-3 whitespace-nowrap">Quantity</th>
+                            <th scope="col" class="px-4 py-3 whitespace-nowrap">MRP</th>
                             <th scope="col" class="px-4 py-3 whitespace-nowrap">Sell Price</th>
                             <th scope="col" class="px-4 py-3 whitespace-nowrap">Purches Price</th>
-                            <th scope="col" class="px-4 py-3 whitespace-nowrap">MRP</th>
                             <th scope="col" class="px-4 py-3 whitespace-nowrap">Min Qty</th>
                             <th scope="col" class="px-4 py-3 whitespace-nowrap">Action</th>
                         </tr>
@@ -81,12 +81,12 @@
                                 </td>
                                 <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                     <div class="flex items-center">
-                                        {{product.prod_sell_price}}
+                                        {{product.prod_mrp}}
                                     </div>
                                 </td>
                                 <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                     <div class="flex items-center">
-                                        {{product.prod_mrp}}
+                                        {{product.prod_sell_price}}
                                     </div>
                                 </td>
                                 <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
