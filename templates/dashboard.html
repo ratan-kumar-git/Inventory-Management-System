@@ -145,7 +145,7 @@
                             <select id="product_select" name="product_id" required
                                 class="p-1 w-2/4 bg-rose-500 text-white text-sm border border-gray-30 rounded-lg">
                                 <option value="">Select Product</option>
-                                {% for product in low_prod_stock %}
+                                {% for product in products %}
                                 <option value="{{ product.id }}">{{ product.prod_name }}</option>
                                 {% endfor %}
                             </select>

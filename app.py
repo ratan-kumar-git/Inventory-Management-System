@@ -174,13 +174,46 @@ def login():
         password = request.form['password']
 
         user = User.query.filter_by(email=email).first()
-        if user and user.check_password(password):
-            session['email'] = user.email
-            return redirect('/dashboard')
+        if user:
+            if user.check_password(password):
+                session['email'] = user.email
+                return redirect('/dashboard')
+            else:
+                error = 'Incorrect password. Please try again.'
         else:
-            error = 'Invalid email or password. Please try again.'
-            flash(error, 'error')
+            error = 'Email not found. Please register first.'
+        flash(error, 'error')
     return render_template('login.html', title='Login Page')
+
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    if 'email' not in session:
+        flash('You need to login first.', 'error')
+        return redirect('/login')
+
+    user = User.query.filter_by(email=session['email']).first()
+
+    if request.method == 'POST':
+        current_password = request.form['current_password']
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+
+        if not user.check_password(current_password):
+            flash('Current password is incorrect.', 'error')
+            return redirect('/change_password')
+
+        if new_password != confirm_password:
+            flash('New passwords do not match.', 'error')
+            return redirect('/change_password')
+
+        # Update password
+        user.password = user.hash_password(new_password)
+        db.session.commit()
+        flash('Password updated successfully.', 'success')
+        return redirect('/change_password')
+
+    return render_template('change_password.html', title='Change Password', user=user)
+
 
 #Dashboard
 @app.route('/dashboard', methods=['GET', 'POST'])
@@ -193,6 +226,9 @@ def dashboard():
         # Get products with low stock
         low_prod_stock = Products.query.filter(Products.user_id == user.id, Products.prod_quantity<=Products.prod_min_quantity).order_by(Products.prod_quantity).all()
         
+        #get all products
+        products = Products.query.filter(Products.user_id == user.id).order_by(Products.id).all() 
+
         # Get total customers, products, billings, and sales
         total_customer = Customer.query.filter(Customer.user_id == user.id).count()
         total_product = Products.query.filter(Products.user_id == user.id).count()
@@ -214,8 +250,7 @@ def dashboard():
         return render_template('dashboard.html', title='Dashboard', current_page = 'dashboard', 
             user=user, messages=messages, customers=customers, low_prod_stock=low_prod_stock,
             total_customer=total_customer, total_product=total_product, total_sales=total_sales, 
-            total_billings=total_billings
-            )
+            total_billings=total_billings, products=products)
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')

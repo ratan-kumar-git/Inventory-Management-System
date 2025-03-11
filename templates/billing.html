@@ -3,7 +3,8 @@
 {% block content %}
 
 <main class="p-4 md:ml-64 h-auto pt-20">
-    <div class="p-5 m-2 md:m-5 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-300 dark:border-gray-700">
+    <div
+        class="p-5 m-2 md:m-5 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-300 dark:border-gray-700">
         <!-- Header Div -->
         <div class="flex justify-center items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
             <h3 class="text-2xl uppercase font-extrabold text-gray-900 dark:text-white">
@@ -67,13 +68,32 @@
             class="hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-modal md:h-full">
             <div class="relative p-4 w-full max-w-2xl">
                 <!-- Modal content -->
-                <div class="relative p-4 bg-white rounded-lg shadow dark:bg-gray-900 sm:p-5">
+                <div class="relative p-4 rounded-lg shadow bg-sky-100 dark:bg-gray-900 sm:p-5">
                     <!-- Modal header -->
                     <div
                         class="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        <h3 class="w-2/4 text-lg font-semibold text-gray-900 dark:text-white">
                             Product List
                         </h3>
+
+                        <!-- Search button in item List -->
+                        <div class="mr-5 relative w-2/4">
+                            <!-- Search Icon -->
+                            <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+                                <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor"
+                                    viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                        d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <!-- Search Input -->
+                            <input type="text" id="productSearch"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                placeholder="Search" />
+                        </div>
+
+                        <!-- close model button -->
                         <button type="button"
                             class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
                             data-modal-toggle="updateProductModal">
@@ -89,9 +109,9 @@
 
                     <!-- Modal body -->
                     <div class="overflow-auto h-[80vh] md:h-96 rounded-md">
-                        <table id="product_table "
-                            class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                            <thead class="text-md uppercase text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <table id="product_table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                            <thead
+                                class="text-md uppercase text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
                                     <th class="px-4 py-3 whitespace-nowrap">SNo</th>
                                     <th class="px-4 py-3 whitespace-nowrap">Add</th>
@@ -104,14 +124,15 @@
                             </thead>
                             <tbody>
                                 {% for product in products %}
-                                <tr class="border-b text-base dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        {{loop.index }}
+                                <tr
+                                    class="border-b text-base dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <td class="serial-no px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        
                                     </td>
                                     <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        <button class="add-to-bill rounded-lg p-1 hover:bg-gray-300 dark:hover:bg-gray-800"
-                                            data-prod-id="{{ product.id }}"
-                                            data-prod-name="{{ product.prod_name }}"
+                                        <button
+                                            class="add-to-bill rounded-lg p-1 hover:bg-gray-300 dark:hover:bg-gray-800"
+                                            data-prod-id="{{ product.id }}" data-prod-name="{{ product.prod_name }}"
                                             data-prod-mrp="{{ product.prod_mrp }}"
                                             data-prod-sell="{{ product.prod_sell_price }}">
                                             ➕
@@ -395,6 +416,39 @@
         });
     });
 
+    // Search product in the product table
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('productSearch');
+        const productRows = document.querySelectorAll('#product_table tbody tr');
 
+        // Function to update serial numbers dynamically
+        function updateSerialNumbers() {
+            let visibleRows = [...productRows].filter(row => row.style.display !== 'none');
+            visibleRows.forEach((row, index) => {
+                row.querySelector('.serial-no').textContent = index + 1; // Dynamic SNo.
+            });
+        }
+
+        searchInput.addEventListener('input', function () {
+            const searchText = searchInput.value.toLowerCase();
+
+            productRows.forEach(row => {
+                const productName = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+
+                // Show if search text matches or is empty
+                if (!searchText || productName.includes(searchText)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Update serial numbers after filtering
+            updateSerialNumbers();
+        });
+
+        // Initial serial number setup
+        updateSerialNumbers();
+    });
 </script>
 {% endblock %}
