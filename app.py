@@ -185,6 +185,7 @@ def login():
         flash(error, 'error')
     return render_template('login.html', title='Login Page')
 
+# Change Password
 @app.route('/change_password', methods=['GET', 'POST'])
 def change_password():
     if 'email' not in session:
@@ -214,7 +215,6 @@ def change_password():
 
     return render_template('change_password.html', title='Change Password', user=user)
 
-
 #Dashboard
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
@@ -232,6 +232,9 @@ def dashboard():
         # Get total customers, products, billings, and sales
         total_customer = Customer.query.filter(Customer.user_id == user.id).count()
         total_product = Products.query.filter(Products.user_id == user.id).count()
+        # Calculate total stock value (quantity * buy price)
+        total_stock_value = (db.session.query(func.sum(Products.prod_quantity * Products.prod_buy_price))
+            .filter(Products.user_id == user.id).scalar()) or 0
 
         total_billings = (
         db.session.query(Billing)
@@ -250,7 +253,7 @@ def dashboard():
         return render_template('dashboard.html', title='Dashboard', current_page = 'dashboard', 
             user=user, messages=messages, customers=customers, low_prod_stock=low_prod_stock,
             total_customer=total_customer, total_product=total_product, total_sales=total_sales, 
-            total_billings=total_billings, products=products)
+            total_billings=total_billings, products=products, total_stock_value=total_stock_value)
     else:
         flash('You need to login first.', 'error')
         return redirect('/login')
@@ -295,7 +298,6 @@ def get_product_details(id):
     
     return jsonify({'error': 'Customer not found'}), 404
 
-
 #Customer
 @app.route('/customers', methods=['GET', 'POST'])
 def customers():
@@ -307,7 +309,7 @@ def customers():
         page = request.args.get('page', 1, type=int)
         
         # Paginate products (10 per page)
-        customers = Customer.query.filter(Customer.user_id == user.id).order_by(Customer.id.desc()).paginate(page=page, per_page=10)
+        customers = Customer.query.filter(Customer.user_id == user.id).order_by(Customer.id.desc()).paginate(page=page, per_page=250)
         total_customer = Customer.query.filter(Customer.user_id == user.id).count()
 
         # Get total dues separately
@@ -455,8 +457,8 @@ def products():
         # Get page number from request arguments, default to 1
         page = request.args.get('page', 1, type=int)
         
-        # Paginate products (10 per page)
-        products = Products.query.filter(Products.user_id == user.id).order_by(Products.id.desc()).paginate(page=page, per_page=10)
+        # Paginate products (10 per page) 
+        products = Products.query.filter(Products.user_id == user.id).order_by(Products.id.desc()).paginate(page=page, per_page=250)
         total_product = Products.query.filter(Products.user_id == user.id).count()
 
         return render_template('product.html', title='Products', current_page='products', 
@@ -758,8 +760,7 @@ def billing_history():
         flash('You need to login first.', 'error')
         return redirect('/login')
 
-
-#Contact_us
+#About_us
 @app.route('/about_us')
 def about_us():
     if 'email' in session:
@@ -769,7 +770,6 @@ def about_us():
     else:
         return render_template('about_us.html', title='About Us', current_page = 'about_us')
     
-
 #Contact_us
 @app.route('/contact_us', methods=['GET','POST'])
 def contact_us():
@@ -799,7 +799,6 @@ def contact_us():
 
             flash('Message Send Successful.', 'success')
         return render_template('contact_us.html', title='Contact Us', current_page = 'contact_us')
-
 
 #Deleting Contact Us Message
 @app.route('/delete_message/<int:id>', methods=['GET'])
