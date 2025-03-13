@@ -21,7 +21,7 @@
                     </div>
                     <input type="text" id="simple-search"
                         class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                        placeholder="Search Product" required="">
+                        placeholder="Search Customer" required="">
                 </div>
                 <div
                     class="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
@@ -102,7 +102,7 @@
                                 <!-- Whatsapp Button -->
                                 <div
                                     class="flex items-center justify-center mr-2 p-2 hover:bg-slate-800 hover:rounded-md">
-                                    <a href="https://wa.me/91{{customer.customer_mob_no}}?text=बधाई हो {{customer.customer_name}}, किसान मोटर पार्ट्स(अगिआंव बाजार) में आपका स्वागत है! हमें आपके साथ जुड़कर खुशी हुई। हमारे साथ बेहतरीन सेवा और शानदार अनुभव का आनंद लें!"
+                                    <a href="https://wa.me/91{{customer.customer_mob_no}}?text={{ 'बधाई%20हो%20' + customer.customer_name + ',%20किसान%20मोटर%20पार्ट्स(%E0%A4%85%E0%A4%97%E0%A4%BF%E0%A4%86%E0%A4%82%E0%A4%B5%20%E0%A4%AC%E0%A4%BE%E0%A4%9C%E0%A4%BE%E0%A4%B0)%20में%20आपका%20स्वागत%20है!%20हमें%20आपके%20साथ%20जुड़कर%20खुशी%20हुई।%20हमारे%20साथ%20बेहतरीन%20सेवा%20और%20शानदार%20अनुभव%20का%20आनंद%20लें!' }}"
                                         target="_blank">
                                         <button class="flex justify-center items-center">
                                             <svg class="w-5 h-5 text-green-500" fill="currentColor"
