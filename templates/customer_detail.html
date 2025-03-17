@@ -32,7 +32,7 @@
                 <label for="Customer Dues" class="block">
                     Send Dues Msg :
                     <a class="float-end mt-1 md:ml-4"
-                        href="https://wa.me/91{{customer.customer_mob_no}}?text={{ 'नमस्कार!%20प्रिय%20ग्राहक(%20' + customer.customer_name + '%20),%20आपके%20Kishan%20Motors%20पर%20%E2%82%B9' + total_dues|string + '%20बकाया%20हैं।%20कृपया%20समय%20पर%20भुगतान%20करें।%20धन्यवाद!' }}"
+                        href="https://wa.me/91{{customer.customer_mob_no}}?text={{ 'नमस्कार!%20प्रिय%20ग्राहक(%20' + customer.customer_name + '%20),%20आपके%20'+ user.shop_name  +'%20पर%20%E2%82%B9' + total_dues|string + '%20बकाया%20हैं।%20कृपया%20समय%20पर%20भुगतान%20करें।%20धन्यवाद!' }}"
                         target="_blank">
                         <button class="flex justify-center items-center">
                             <svg class="w-6 h-6 text-green-500" fill="currentColor" xmlns="http://www.w3.org/2000/svg"

@@ -27,12 +27,18 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
+    shop_name = db.Column(db.String(100), nullable=False)
+    shop_address = db.Column(db.String(200), nullable=False)
+    mob_number = db.Column(db.String(100), nullable=False)
 
 
-    def __init__(self, email, password, name):
+    def __init__(self, email, password, name, shop_name, shop_address, mob_number):
         self.name = name
         self.email = email
         self.password = self.hash_password(password)
+        self.shop_name = shop_name
+        self.shop_address = shop_address
+        self.mob_number = mob_number
 
     def hash_password(self, password):
         return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -142,22 +148,19 @@ def index():
 @app.route('/signup', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        # Check if there's already a user registered
-        # existing_users = User.query.count()
-        # if existing_users >= 2:
-        #     flash('Registration is closed. Only two user is allowed to the website', 'error')
-        #     return redirect('/login')
-
         name = request.form['name']
         email = request.form['email']
         password = request.form['password']
+        shop_name = request.form['shop_name']
+        shop_address = request.form['shop_address']
+        mob_number = request.form['mob_number']
 
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
             flash('Email already exists. Please use different email.', 'error')
-            return redirect('/signup')  # Redirect back to registration page with flash message
+            return redirect('/signup')
 
-        new_user = User(name=name, email=email, password=password)
+        new_user = User(name=name, email=email, password=password, shop_name=shop_name, shop_address=shop_address, mob_number=mob_number)
         db.session.add(new_user)
         db.session.commit()
         flash('Registration successful. Please log in.', 'success')
@@ -184,6 +187,26 @@ def login():
             error = 'Email not found. Please register first.'
         flash(error, 'error')
     return render_template('login.html', title='Login Page')
+
+# Update Profile
+@app.route('/update_profile', methods=['GET', 'POST'])
+def update_profile():
+    if 'email' in session:
+        user = User.query.filter_by(email=session['email']).first()
+        messages = Contact_us.query.order_by(Contact_us.id.desc()).all()
+
+        if request.method == 'POST':
+            user.name = request.form['name']
+            user.shop_name = request.form['shop_name']
+            user.shop_address = request.form['shop_address']
+            user.mob_number = request.form['mob_number']
+
+            db.session.commit()
+            flash('Profile Update Successful.', 'success')
+        return render_template('update_profile.html', title='Update Profile', user=user, messages=messages)
+    else:
+        flash('You need to login first.', 'error')
+        return redirect('/login')
 
 # Change Password
 @app.route('/change_password', methods=['GET', 'POST'])
@@ -337,12 +360,16 @@ def add_customer():
             customer_name = request.form['customer_name']
             customer_village = request.form['customer_vill_name']
             customer_mob_no = request.form['mobile_number']
-        
-            new_data = Customer(user_id=user.id, customer_name=customer_name, customer_village=customer_village, customer_mob_no=customer_mob_no)
-            db.session.add(new_data)
-            db.session.commit()
-            flash('Customer Added Successful.', 'success')
 
+            # Check if the mobile number already exists
+            existing_customer = Customer.query.filter_by(customer_mob_no=customer_mob_no).first()
+            if existing_customer:
+                flash('Customer with this mobile number already exists.', 'error')
+            else:
+                new_data = Customer(user_id=user.id, customer_name=customer_name, customer_village=customer_village, customer_mob_no=customer_mob_no)
+                db.session.add(new_data)
+                db.session.commit()
+                flash('Customer Added Successful.', 'success')
         return render_template('add_customer.html', title='Add Customer', current_page = 'add_customer', user=user, messages=messages)
     else:
         flash('You need to login first.', 'error')
