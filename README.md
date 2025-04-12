@@ -22,7 +22,8 @@ A lightweight and user-friendly inventory management system built using **Flask*
 
 ## 📸 Screenshots
 
-*(Add screenshots of your homepage, inventory page, dashboard, etc.)*
+
+![Home Page](Screenshots Img/home.png)
 
 ## 🧑‍💻 Getting Started
 
