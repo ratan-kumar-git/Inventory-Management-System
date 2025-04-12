@@ -21,9 +21,10 @@ A lightweight and user-friendly inventory management system built using **Flask*
 - **Templating Engine:** Jinja2
 
 ## 📸 Screenshots
-
-
-![Home Page](Screenshots Img/home.png)
+### 🔹 Home Page
+![Home Page](ScreenshotsImg/home.png)
+### 🔹 Dashboard Page
+![dashboard Page](ScreenshotsImg/dashboard.png)
 
 ## 🧑‍💻 Getting Started
 
