@@ -1,2 +1,7 @@
 .venv
 node_modules/
+notes.txt
+schema rule.sqlite3-query
+package.json
+package-lock.json
+tailwind.config.js
