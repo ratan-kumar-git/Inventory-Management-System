@@ -66,9 +66,9 @@ class Products(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     prod_name = db.Column(db.String(100), nullable=False)
     prod_quantity = db.Column(db.Integer, nullable=False)
-    prod_sell_price = db.Column(db.Integer, nullable=False)
-    prod_mrp = db.Column(db.Integer, nullable=False)
-    prod_buy_price = db.Column(db.Integer, nullable=False)
+    prod_sell_price = db.Column(db.Float, nullable=False)
+    prod_mrp = db.Column(db.Float, nullable=False)
+    prod_buy_price = db.Column(db.Float, nullable=False)
     prod_min_quantity = db.Column(db.Integer, nullable=False)
 
     def __init__(self, user_id, prod_name, prod_quantity, prod_sell_price, prod_mrp, prod_buy_price, prod_min_quantity):
