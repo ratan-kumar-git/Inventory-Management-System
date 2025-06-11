@@ -9,7 +9,7 @@
                 About Us
             </div>
             {% if user %}
-                <img class="rounded-full w-56 h-56" src="{{ url_for('static', filename='images/kisan-motor-logo.png') }}" alt="image description">
+                <img class="rounded-full w-56 h-56" src="{{ url_for('static', filename='images/kisan-motor-logo.webp') }}" alt="image description">
                 <h2 class="mt-4 text-3xl font-bold text-center text-gray-900 dark:text-slate-300">
                     Owner: {{user.name}}
                 </h2>
@@ -18,7 +18,7 @@
                     <h2>Mob No: +91 {{user.mob_number}}</h2>
                 </div>
             {% else %}
-                <img class="rounded-full w-56 h-56" src="{{ url_for('static', filename='images/ratan.jpeg') }}" alt="image description">
+                <img class="rounded-full w-56 h-56" src="{{ url_for('static', filename='images/ratan.webp') }}" alt="image description">
                 <h2 class="mt-4 text-3xl font-bold text-center text-gray-900 dark:text-slate-300">
                     Developer: Ratan Kumar
                 </h2>

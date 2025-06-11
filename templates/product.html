@@ -278,10 +278,10 @@
 
         // Filter rows based on search input
         searchInput.addEventListener('input', function () {
-            const searchText = searchInput.value.toLowerCase();
+            const searchText = searchInput.value.toLowerCase().replace(/\s/g, '');
 
             productRows.forEach(row => {
-                const productName = row.querySelector('th').textContent.toLowerCase(); // Get product name from <th>
+                const productName = row.querySelector('th').textContent.toLowerCase().replace(/\s/g, ''); // Get product name from <th>
 
                 // Show if matches or hide if not
                 if (!searchText || productName.includes(searchText)) {
